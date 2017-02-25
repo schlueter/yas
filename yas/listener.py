@@ -15,7 +15,6 @@ def log(*msg): print(*msg, file=sys.stderr)
 DEFAULT_IGNORED_TYPES = ['desktop_notification', 'user_typing']
 BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 BOT_NAME = os.environ.get('SLACK_BOT_NAME')
-READ_WEBSOCKET_DELAY = float(os.environ.get('READ_WEBSOCKET_DELAY', 1))
 
 class Client(SlackClient):
 
@@ -32,7 +31,7 @@ class Client(SlackClient):
                 'channel' in data and data.get('user') != self.bot_id:
             channel = data['channel']
             channel_info = self.api_call('channels.info', channel=channel)
-            if channel_info.get('ok') and self.at_bot in output['text']:
+            if channel_info.get('ok') and self.at_bot in data['text']:
                 return True
             group_info = self.api_call('groups.info', channel=channel)
             if not channel_info.get('ok', False) and not group_info.get('ok', False):
@@ -55,7 +54,7 @@ class Client(SlackClient):
     def process_changes(self, data):
         super().process_changes(data)
         if self.data_filter(data):
-            log(f'Processing filtered data: {data}')
+            log(f'Processing: {data}')
             channel = data.get('channel')
             def reply(message, channel=channel, thread=None, reply_broadcast=None):
                 self.rtm_send_message(channel, message, thread, reply_broadcast)
@@ -70,7 +69,6 @@ class Client(SlackClient):
             log("Slack bot connected as {}<{}> and running!".format(self.bot_name, self.bot_id))
             while True:
                 self.rtm_read()
-                time.sleep(READ_WEBSOCKET_DELAY)
         else:
             log("Connection failed. Invalid Slack token or bot ID?")
 
