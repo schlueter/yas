@@ -1,0 +1,14 @@
+# Ansible Managed
+#
+/var/log/rabbitmq/*.log {
+    daily
+    missingok
+    rotate 7
+    compress
+    delaycompress
+    notifempty
+    sharedscripts
+    postrotate
+        /etc/init.d/rabbitmq-server rotate-logs > /dev/null
+    endscript
+}

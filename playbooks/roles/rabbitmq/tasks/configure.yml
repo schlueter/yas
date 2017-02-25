@@ -1,0 +1,33 @@
+---
+- name: Install main RabbitMQ config
+  template:
+    src=etc/rabbitmq/rabbitmq.config.j2
+    dest=/etc/rabbitmq/rabbitmq.config
+    owner=root
+    group=root
+    mode=0644
+  notify: Restart rabbitmq
+
+- name: Copy RabbitMQ configs
+  copy:
+    src=etc/{{ item }}
+    dest=/etc/{{ item }}
+    owner=root
+    group=root
+    mode=0644
+  with_items:
+  - default/rabbitmq-server
+  - logrotate.d/rabbitmq-server
+  notify: Restart rabbitmq
+
+- name: Ensure rabbitmq is running
+  service:
+    name=rabbitmq-server
+    state=started
+    enabled=yes
+
+- name: Ensure HA policy on queues
+  rabbitmq_policy:
+    name=HA
+    pattern='.*'
+    tags="ha-mode=all,ha-sync-mode=automatic"

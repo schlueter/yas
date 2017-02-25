@@ -1,0 +1,7 @@
+---
+- name: Join replica nodes to primary
+  shell: |
+    rabbitmqctl stop_app
+    rabbitmqctl join_cluster rabbit@{{ groups['rabbitmq_primary'][0] }}
+    rabbitmqctl start_app
+  when: "'rabbitmq_replica' in group_names"

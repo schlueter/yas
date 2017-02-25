@@ -1,0 +1,58 @@
+%% {{ ansible_managed }}
+%% Trigger reload on hostname change: {{ ansible_fqdn }}
+%%
+[
+ {rabbit,
+  [
+   {tcp_listeners, [5672]},
+   {log_levels, [{connection, {{ log_level }}}, {channel, {{ log_level }}}]},
+   {reverse_dns_lookups, true},
+   {loopback_users, []},
+   {auth_backends, [rabbit_auth_backend_internal]},
+
+   {password_hashing_module, rabbit_password_hashing_sha256},
+
+   {default_vhost,       <<"/">>},
+   {default_user,        <<"{{ default_user }}">>},
+   {default_pass,        <<"{{ default_password }}">>},
+   {default_permissions, [<<".*">>, <<".*">>, <<".*">>]},
+   {default_user_tags, [administrator]},
+
+   {vm_memory_high_watermark, {{ mem_watermark }}},
+
+   {hipe_compile, true}
+  ]},
+
+ {kernel,
+  [
+    {inet_dist_listen_min, 9000},
+    {inet_dist_listen_max, 9004}
+  ]},
+
+ {rabbitmq_management,
+  [
+   {http_log_dir, "/var/log/rabbitmq/management_api.log"}
+  ]},
+
+ {rabbitmq_shovel,
+  [{shovels,
+    [
+    ]}
+  ]},
+
+ {rabbitmq_stomp,
+  [
+  ]},
+
+ {rabbitmq_mqtt,
+  [
+  ]},
+
+ {rabbitmq_amqp1_0,
+  [
+  ]},
+
+ {rabbitmq_auth_backend_ldap,
+  [
+  ]}
+].

@@ -1,0 +1,7 @@
+---
+- include: cookie.yml
+- include: install.yml
+- include: configure.yml
+- include: clustering.yml
+  tags: skip_on_check
+- include: plugins.yml

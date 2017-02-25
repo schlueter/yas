@@ -1,0 +1,33 @@
+---
+#
+# NOTE:
+#
+# Updating the erlang cookie on mid flight (before a restart) will
+# prevent all reminder ansible "rabbitmq_YYYY" commands from working
+# and create all sorts of rabbitmq havoc since ansible/rabbitmqctl
+# will be using the previous cookie value.
+#
+# Hence why we are doing this first, by the start of the run, by
+# a) creating /var/lib/rabbitmq folder (no owner:group)
+# b) copying cookie file and (no owner:group)
+# c) then, installing rabbitmq from packages
+#
+# During the rabbitmq package install, the rabbitmq:rabbitmq user:group
+# will be newly created and reassigned ownership of this folder + file;
+# subsequent runs of this playbook won't alter permissions and make the
+# role idempotent.
+#
+# Reference:
+# https://groups.google.com/forum/#!topic/rabbitmq-users/a6sqrAUX_Fg
+#
+- name: Create RabbitMQ cookie folder
+  file:
+    path=/var/lib/rabbitmq
+    state=directory
+
+- name: Copy RabbitMQ HA Cookie
+  copy:
+    content={{ erlang_cookie }}
+    dest=/var/lib/rabbitmq/.erlang.cookie
+    mode=0400
+  notify: Restart rabbitmq
