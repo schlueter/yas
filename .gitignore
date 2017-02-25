@@ -1,0 +1,7 @@
+*.pyc
+/.eggs/
+/build/
+AUTHORS
+ChangeLog
+Facade.egg-info/
+build/
