@@ -18,7 +18,7 @@ def list_handler(search_opts, result_fields):
         result_fields.split(',')
     else:
         result_fields = ['name', 'tags', 'description', 'status', 'addresses']
-    log(f'Intiating search')
+    log(f'Initiating search')
 
     return pformat((search_opts, result_fields))
 
@@ -42,5 +42,11 @@ handlers = {
     re.compile('(?:delete|drop|terminate|bust a cap in|pop a cap in) ([-\ \w]+)'): delete_handler
 }
 
-def handler(datum, reply):
-    raise HandlerError(datum, reply)
+def handler(data, reply):
+    for regex in handlers:
+        match = regex.match(data.get('text'))
+        if match:
+            groups = match.groups()
+            return reply(handlers[regex](*groups))
+    else:
+        raise HandlerError("Sure...write some more code then I can do that!")
