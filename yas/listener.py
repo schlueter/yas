@@ -5,92 +5,71 @@ import time
 
 from slackclient import SlackClient
 
-from slackbot.handlers import handlers
+from yas.handlers import handler, HandlerError
 
 class SlackClientFailure(Exception):
     pass
 
 def log(*msg): print(*msg, file=sys.stderr)
 
+DEFAULT_IGNORED_TYPES = ['desktop_notification', 'user_typing']
 BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 BOT_NAME = os.environ.get('SLACK_BOT_NAME')
 READ_WEBSOCKET_DELAY = float(os.environ.get('READ_WEBSOCKET_DELAY', 1))
 
 class Client(SlackClient):
 
-    def __init__(self):
+    def __init__(self, data_filter=None, ignored_types=None):
         super().__init__(BOT_TOKEN)
+        self.bot_name = BOT_NAME
         self.bot_id = self.__retrieve_bot_user_id()
         self.at_bot = "<@" + self.bot_id + ">"
+        self.data_filter = data_filter or self.__default_data_filter
+        self.ignored_types = ignored_types or DEFAULT_IGNORED_TYPES
+
+    def __default_data_filter(self, data):
+        if data.get('type') not in self.ignored_types and \
+                'channel' in data and data.get('user') != self.bot_id:
+            channel = data['channel']
+            channel_info = self.api_call('channels.info', channel=channel)
+            if channel_info.get('ok') and self.at_bot in output['text']:
+                return True
+            group_info = self.api_call('groups.info', channel=channel)
+            if not channel_info.get('ok', False) and not group_info.get('ok', False):
+                return True
 
     def __retrieve_bot_user_id(self):
-        log("Retrieving users list.")
+        log("Retrieving users list for self identification...")
         api_call = self.api_call("users.list")
         if api_call.get('ok'):
             # retrieve all users so we can find our bot
             users = api_call.get('members')
-            log(f"Pulling the ID for the bot, {BOT_NAME}.")
             for user in users:
-                if 'name' in user and user.get('name') == BOT_NAME:
+                if 'name' in user and user.get('name') == self.bot_name:
                     return user.get('id')
             else:
-                raise NoBot("could not find bot user with the name " + BOT_NAME)
+                raise NoBot("could not find bot user with the name " + self.bot_name)
         else:
             raise SlackClientFailure()
 
-    def handle_command(self, command, channel):
-        """
-            Receives commands directed at the bot and determines if they
-            are valid commands. If so, then acts on the commands. If not,
-            returns back what it needs for clarification.
-        """
-
-        log(f'handling {command}')
-        for regex in handlers:
-            match = regex.match(command)
-            if match:
-                groups = match.groups()
-                return self.reply(channel, handlers[regex](*groups))
-        else:
-            return "Sure...write some more code then I can do that!"
-
-    def reply(self, channel, response):
-        return self.api_call(
-            "chat.postMessage",
-            channel=channel,
-            text=response,
-            as_user=True
-        )
-
-    def parse_slack_output(self, rtm_output):
-        """
-            The Slack Real Time Messaging API is an events firehose.
-            this parsing function returns None unless a message is
-            directed at the Bot, based on its ID.
-        """
-        if rtm_output and len(rtm_output) > 0:
-            for output in [output for output in rtm_output
-                              if output
-                                  and 'channel' in output
-                                  and 'text' in output
-                                  and not output.get('user') == self.bot_id]:
-                channel_info = self.api_call('channels.info', channel=output.get('channel'))
-                if channel_info.get('ok', False) and AT_BOT in output['text']:
-                    log(f"receieved message in {output['channel']} from {output['user']}: {output['text']}")
-                    return output['text'].split(AT_BOT)[1].strip().lower(), output['channel']
-                group_info = self.api_call('groups.info', channel=output.get('channel'))
-                if not channel_info.get('ok', False) and not group_info.get('ok', False):
-                    log(f"receieved direct message from {output['user']}: {output['text']}")
-                    return output['text'].strip().lower(), output['channel']
-        return None, None
+    def process_changes(self, data):
+        super().process_changes(data)
+        if self.data_filter(data):
+            log(f'Processing filtered data: {data}')
+            channel = data.get('channel')
+            def reply(message, channel=channel, thread=None, reply_broadcast=None):
+                self.rtm_send_message(channel, message, thread, reply_broadcast)
+            try:
+                handler(data, reply)
+            except HandlerError as e:
+                self.rtm_send_message(channel, str(e))
+                # self.rtm_send_message(channel, "Sure...write some more code then I can do that!")
 
     def listen(self):
         if self.rtm_connect():
-            log("Slack bot connected as {}<{}> and running!".format(BOT_NAME, self.bot_id))
+            log("Slack bot connected as {}<{}> and running!".format(self.bot_name, self.bot_id))
             while True:
-                command, channel = self.parse_slack_output(self.rtm_read())
-                if command and channel:
-                    self.handle_command(command, channel)
+                self.rtm_read()
                 time.sleep(READ_WEBSOCKET_DELAY)
         else:
             log("Connection failed. Invalid Slack token or bot ID?")

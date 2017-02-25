@@ -2,6 +2,9 @@ import re
 import sys
 from pprint import pformat
 
+class HandlerError(Exception):
+    pass
+
 def log(*msg): print(*msg, file=sys.stderr)
 
 def list_handler(search_opts, result_fields):
@@ -38,3 +41,6 @@ handlers = {
     re.compile('(?:launch|start|create)\ ([-\w]+)(?:\ on\ )?([-\w]+:?[-\w]+)?'): create_handler,
     re.compile('(?:delete|drop|terminate|bust a cap in|pop a cap in) ([-\ \w]+)'): delete_handler
 }
+
+def handler(datum, reply):
+    raise HandlerError(datum, reply)
