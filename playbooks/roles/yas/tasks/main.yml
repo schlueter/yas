@@ -4,6 +4,7 @@
     repo=git@github.com:schlueter/yas
     dest={{ local_repository }}
     update=no
+    accept_hostkey=yes
 
 - name: Install yas
   pip:

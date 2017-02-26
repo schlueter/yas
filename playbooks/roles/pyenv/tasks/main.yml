@@ -1,0 +1,57 @@
+---
+- name: Create pyenv group
+  group: name=pyenv system=yes
+
+- name: Clone pyenv
+  git:
+    repo=https://github.com/yyuu/pyenv.git
+    dest=/usr/local/lib/pyenv
+    update=no
+
+- name: Add users to pyenv group
+  user:
+    name={{ item }}
+    append=yes
+    groups=pyenv
+  with_items: "{{ users }}"
+
+- name: Give pyenv group access to the pyenv directory
+  file:
+    path=/usr/local/lib/pyenv
+    group=pyenv
+    recurse=yes
+    mode=3775
+
+- name: Add PYENV_ROOT to global environment and update PATH
+  lineinfile:
+    line=PYENV_ROOT=/usr/local/lib/pyenv
+    insertbefore=PATH=
+    dest=/etc/environment
+
+- name: Update global PATH with pyenv bin
+  lineinfile:
+    line='PATH=/usr/local/lib/pyenv/bin:\1'
+    regexp='^PATH="(?!/usr/local/lib/pyenv/bin:)(.*)'
+    backrefs=yes
+    dest=/etc/environment
+
+- name: Install some common deps
+  apt:
+    state=latest
+    pkg={{ item }}
+    update_cache=yes
+    cache_valid_time=1800
+  with_items:
+    - zlib1g-dev
+    - openssl
+    - libbz2-dev
+    - libreadline6-dev
+    - libssl-dev
+    - libsqlite3-dev
+    - build-essential
+
+- name: Install some pythons
+  shell: /usr/local/lib/pyenv/bin/pyenv install -g {{ item }}
+  environment:
+    PYENV_ROOT: /usr/local/lib/pyenv
+  with_items: "{{ pythons }}"

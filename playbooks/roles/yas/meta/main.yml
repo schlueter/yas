@@ -1,4 +1,4 @@
 ---
 dependencies:
   - rabbitmq
-  - python3.6
+  - pyenv
