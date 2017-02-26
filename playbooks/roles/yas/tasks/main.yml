@@ -1,0 +1,13 @@
+---
+- name: Clone yas repo
+  git:
+    repo=git@github.com:schlueter/yas
+    dest={{ local_repository }}
+    update=no
+
+- name: Install yas
+  pip:
+    name={{ local_repository }}
+    state=latest
+    executable={{ pip_executable }}
+

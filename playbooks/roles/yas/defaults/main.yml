@@ -1,0 +1,3 @@
+---
+local_repository: /tmp/yas
+pip_executable: /usr/bin/pip3

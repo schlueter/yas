@@ -11,5 +11,6 @@ Vagrant.configure("2") do |config|
     playbook: "playbooks/main.yml",
     sudo: true,
     verbose: "vv",
-    raw_arguments: ["--diff"]
+    raw_arguments: ["--diff"],
+    extra_vars: { local_repository: "/vagrant" }
 end
