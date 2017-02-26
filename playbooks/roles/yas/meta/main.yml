@@ -1,2 +1,4 @@
 ---
-dependencies: [ rabbitmq ]
+dependencies:
+  - rabbitmq
+  - python3.6
