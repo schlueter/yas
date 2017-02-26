@@ -1,7 +1,7 @@
 ---
 - name: Clone yas repo
   git:
-    repo=git@github.com:schlueter/yas
+    repo=https://github.com/schlueter/yas.git
     dest={{ local_repository }}
     update=no
     accept_hostkey=yes
