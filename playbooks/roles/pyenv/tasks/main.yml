@@ -50,8 +50,17 @@
     - libsqlite3-dev
     - build-essential
 
+- name: Get existing pythons
+  command: pyenv versions
+  command: /usr/local/lib/pyenv/bin/pyenv versions
+  register: versions
+  changed_when: no
+
+- debug: var=versions
+
 - name: Install some pythons
-  shell: /usr/local/lib/pyenv/bin/pyenv install -g {{ item }}
+  command: /usr/local/lib/pyenv/bin/pyenv install {{ item }}
   environment:
     PYENV_ROOT: /usr/local/lib/pyenv
   with_items: "{{ pythons }}"
+  when: not item in versions.stdout_lines | map('trim')
