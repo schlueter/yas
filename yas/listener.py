@@ -1,14 +1,10 @@
 import os
-import re
 import sys
-import time
 
 from slackclient import SlackClient
 
 from yas.handlers import handler, HandlerError
 
-class SlackClientFailure(Exception):
-    pass
 
 def log(*msg): print(*msg, file=sys.stderr)
 
@@ -71,6 +67,9 @@ class Client(SlackClient):
                 self.rtm_read()
         else:
             log("Connection failed. Invalid Slack token or bot ID?")
+
+class SlackClientFailure(Exception):
+    pass
 
 def main():
     client = Client()
