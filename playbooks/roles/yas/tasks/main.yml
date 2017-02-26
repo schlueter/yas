@@ -12,6 +12,23 @@
     state=latest
     executable={{ pip_executable }}
 
+- name: Check for yas env file
+  stat:
+    path={{ local_repository }}/yas.env
+  register: env_file
+
+- debug: msg='No env file found. Please create a populated version of example-yas.env, yas.env to proceed.'
+  when: not env_file.stat.exists
+
+- meta: end_play
+  when: not env_file.stat.exists
+
+- name: Copy yas env file
+  copy:
+    src={{ local_repository }}/yas.env
+    remote_src=yes
+    dest=/usr/local/etc/yas.env
+
 - name: Install yas systemd service
   copy:
     src={{ local_repository }}/yas.service
