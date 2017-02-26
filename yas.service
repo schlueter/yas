@@ -1,0 +1,14 @@
+[Unit]
+Description=Yet Another Slack bot
+After=network.target
+ConditionPathExists=!/usr/local/etc/yas_should_not_be_run
+
+[Service]
+EnvironmentFile=-/usr/local/etc/yas.env
+ExecStart=/usr/local/lib/pyenv/versions/3.6.0/bin/yas
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

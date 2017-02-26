@@ -12,3 +12,16 @@
     state=latest
     executable={{ pip_executable }}
 
+- name: Install yas systemd service
+  copy:
+    src={{ local_repository }}/yas.service
+    remote_src=yes
+    dest=/etc/systemd/system/yas.service
+  when: ansible_service_mgr == 'systemd'
+
+- name: Activate yas systemd service
+  systemd:
+    name=yas
+    daemon_reload=yes
+    enabled=yes
+    state=started
