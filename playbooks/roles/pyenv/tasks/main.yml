@@ -30,7 +30,7 @@
 
 - name: Update global PATH with pyenv bin
   lineinfile:
-    line='PATH=/usr/local/lib/pyenv/bin:\1'
+    line='PATH="/usr/local/lib/pyenv/bin:\1'
     regexp='^PATH="(?!/usr/local/lib/pyenv/bin:)(.*)'
     backrefs=yes
     dest=/etc/environment
