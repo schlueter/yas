@@ -55,10 +55,13 @@ class Client(SlackClient):
             def reply(message, channel=channel, thread=None, reply_broadcast=None):
                 self.rtm_send_message(channel, message, thread, reply_broadcast)
             try:
-                handler(data, reply)
+                handle_messages(data, reply)
             except HandlerError as e:
                 self.rtm_send_message(channel, str(e))
                 # self.rtm_send_message(channel, "Sure...write some more code then I can do that!")
+
+    def handle_messages(self, data, reply):
+        handler(data, reply)
 
     def listen(self):
         if self.rtm_connect():
