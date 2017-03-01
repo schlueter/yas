@@ -3,24 +3,22 @@ import sys
 
 from slackclient import SlackClient
 
+from yas.yaml_file_config import YamlConfiguration as Config
 from yas.handlers import handler, HandlerError
 
 
 def log(*msg): print(*msg, file=sys.stderr)
 
-DEFAULT_IGNORED_TYPES = ['desktop_notification', 'user_typing']
-BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
-BOT_NAME = os.environ.get('SLACK_BOT_NAME')
-
 class Client(SlackClient):
 
     def __init__(self, data_filter=None, ignored_types=None):
-        super().__init__(BOT_TOKEN)
-        self.bot_name = BOT_NAME
+        self.config = Config()
+        super().__init__(self.config.slack_app_token)
+        self.bot_name = self.config.bot_name
         self.bot_id = self.__retrieve_bot_user_id()
         self.at_bot = "<@" + self.bot_id + ">"
         self.data_filter = data_filter or self.__default_data_filter
-        self.ignored_types = ignored_types or DEFAULT_IGNORED_TYPES
+        self.ignored_types = ignored_types or self.config.ignored_types
 
     def __default_data_filter(self, data):
         if data.get('type') not in self.ignored_types and \
@@ -55,7 +53,7 @@ class Client(SlackClient):
             def reply(message, channel=channel, thread=None, reply_broadcast=None):
                 self.rtm_send_message(channel, message, thread, reply_broadcast)
             try:
-                handle_messages(data, reply)
+                self.handle_messages(data, reply)
             except HandlerError as e:
                 self.rtm_send_message(channel, str(e))
                 # self.rtm_send_message(channel, "Sure...write some more code then I can do that!")
