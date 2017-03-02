@@ -57,6 +57,7 @@ class HandlerManager:
     def handle(self, data, reply, api_call):
         for handler in self.handler_list:
             if handler.test(data):
+                log(f'being handled by {handler}')
                 handler.handle(data, reply, api_call, self)
             break
         else:
