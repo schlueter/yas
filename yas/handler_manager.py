@@ -56,10 +56,10 @@ class HandlerManager:
 
     def handle(self, data, reply, api_call):
         for handler in self.handler_list:
-            log(f'Testing {data}')
+            log(f'Testing {data} against {handler}')
             if handler.test(data):
                 log(f'being handled by {handler}')
                 handler.handle(data, reply, api_call, self)
-            break
+                break
         else:
             log(f'No handler found for {data}')
