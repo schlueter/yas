@@ -51,7 +51,6 @@
     - build-essential
 
 - name: Get existing pythons
-  command: pyenv versions
   command: /usr/local/lib/pyenv/bin/pyenv versions
   register: versions
   changed_when: no
