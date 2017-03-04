@@ -59,7 +59,6 @@ class Client(SlackClient):
                 self.handler_manager.handle(data, reply, self.api_call)
             except HandlerError as e:
                 self.rtm_send_message(channel, str(e))
-                # self.rtm_send_message(channel, "Sure...write some more code then I can do that!")
 
     def listen(self):
         if self.rtm_connect():
