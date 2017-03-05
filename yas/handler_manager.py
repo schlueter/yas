@@ -3,11 +3,8 @@ import inspect
 import sys
 
 from yas import YasHandler, NotAHandler, HandlerError
-from yas.yaml_file_config import YamlConfiguration
 from yas.logging import logger, log
 
-
-config = YamlConfiguration()
 
 def import_from_dotted_path(dotted_names, path=None):
     """ import_from_dotted_path('foo.bar') -> from foo import bar; return bar
@@ -27,12 +24,11 @@ def import_from_dotted_path(dotted_names, path=None):
 
     return import_from_dotted_path(remaining_names, path=module.__path__)
 
-def get_bases(target_class):
+def get_ancestors(target_class):
     bases = []
     if target_class is not object:
         for base in target_class.__bases__:
-            bases.extend(get_bases(base))
-
+            bases.extend(get_ancestors(base))
 
     bases.extend(target_class.__bases__)
     return bases
@@ -42,7 +38,7 @@ def is_handler(test_class):
     public_methods = [member[0] for member in inspect.getmembers(test_class)
                       if not member[0].startswith('__')]
 
-    test_class_bases = get_bases(test_class)
+    test_class_bases = get_ancestors(test_class)
     logger.log.debug(f"{test_class} has bases {test_class_bases}")
 
     class_derives_yas_handler = str(YasHandler) in [str(base) for base in test_class_bases]
@@ -60,7 +56,7 @@ def find_handlers_in_module(handler_module):
             if is_handler(handler[1])]
 
 class HandlerManager:
-    def __init__(self, handler_list):
+    def __init__(self, handler_list, debug=False):
 
         logger.log.info(f"Loading handlers from {handler_list}")
 
@@ -85,6 +81,8 @@ class HandlerManager:
 
             except Exception as exception:
                 logger.log.warn(f'Failed to load handler {handler_name}, caught: {exception}')
+                if debug:
+                    raise exception
 
         logger.log.info(f'Loaded handlers: {self.handler_list}')
 
@@ -92,7 +90,8 @@ class HandlerManager:
         logger.log.info(f"Handling {data['yas_hash']}")
         for handler in self.handler_list:
             if handler.test(data):
+                logger.log.info(f"Handling {data['yas_hash']}")
                 handler.handle(data, reply)
-            break
+                break
         else:
             logger.log.info(f'No handler found for {data}')

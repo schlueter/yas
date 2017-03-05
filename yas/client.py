@@ -25,7 +25,7 @@ class Client(SlackClient):
 
         self.ignored_types = ignored_types or config.ignored_types
 
-        self.handler_manager = HandlerManager(config.handler_list)
+        self.handler_manager = HandlerManager(config.handler_list, debug=config.debug)
 
     def __retrieve_bot_user_id(self):
         logger.log.info("Retrieving users list for self identification...")
