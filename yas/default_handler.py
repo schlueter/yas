@@ -1,17 +1,16 @@
 from yas import YasHandler, HandlerError
 from yas.yaml_file_config import YamlConfiguration
-from yas.logging import Logger
+from yas.logging import logger
 
 
-class DefaultHandler(YasHandler, YamlConfiguration):
+config = YamlConfiguration()
+
+class DefaultHandler(YasHandler):
     '''
     YasHandlers, when registered with a Yas installation in the active yas.yml,
     are tested against, and upon matching applied to, incoming messages by Yas
     as they are receieved.
     '''
-    def __init__(self):
-        super(YasHandler).__init__()
-        self.logger = Logger(self.log_level)
 
     def test(self, data):
         '''
@@ -28,7 +27,7 @@ class DefaultHandler(YasHandler, YamlConfiguration):
             channel, and objects originating from the bot. The implementation of this
             behaviour is likely to change in the future, but the default filters are not.
         '''
-        log.info(f"Testing {data['yas_hash']} against {self.__class__}")
+        logger.log.info(f"Testing {data['yas_hash']} against {self.__class__}")
         return True
 
     def handle(self, data, reply):
@@ -62,6 +61,5 @@ class DefaultHandler(YasHandler, YamlConfiguration):
             listeners may be registered. This argument may be replaced in the future with
             something more explicit.
         '''
-        config = Config()
-        log.info(f"Handling {data['yas_hash']} with {self.__class__}")
+        logger.log.info(f"Handling {data['yas_hash']} with {self.__class__}")
         reply(config.default_response)
