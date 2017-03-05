@@ -1,38 +1,13 @@
 import os
+import sys
 
 import yaml
 
 from . import configuration
 
 
-def find_config():
-    for directory in configuration.DIRECTORIES:
-        potential_config_file = os.path.join(directory, configuration.FILE_NAME)
-        if os.path.isfile(potential_config_file):
-            return potential_config_file
-
-    raise NoConfigFileFound
-
 class YamlConfigError(Exception):
     pass
-
-
-class NoConfigFileFound(YamlConfigError):
-    '''No config file found in search path. Please add a config file, {config_file_name}, to one of the following directories:
-
-{fdirectories}
-
-The first one found will be used. The following parameters are available, "None" values must be populated:
-
-{fparameters}'''
-
-    def __init__(self):
-        fdirectories = '\n'.join([f'- {directory}' for directory in configuration.DIRECTORIES])
-        raw_parameters = configuration.PARAMETERS
-        fparameters = '\n'.join([f'{key}: {raw_parameters[key]}' for key in raw_parameters])
-        super().__init__(self.__doc__.format(fdirectories=fdirectories,
-                                           fparameters=fparameters,
-                                           config_file_name=configuration.FILE_NAME))
 
 class RequiredParameter(YamlConfigError):
     '''{parameter} is a required configuration parameter and must be set to a non empty value. Please correct this in your configuration file at {config_file}.'''
@@ -56,5 +31,5 @@ class YamlConfiguration(object):
                 setattr(self, parameter, value)
 
     def __init__(self):
-        config_file = find_config()
+        config_file = os.path.join(sys.prefix, configuration.FILE_NAME)
         self.__parse_config(config_file)

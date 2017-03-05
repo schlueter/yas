@@ -1,6 +1,8 @@
-from yas.errors import HandlerError
+from yas import YasHandler, HandlerError
+from yas.yaml_file_config import YamlConfiguration as Config
 
-class YasHandler:
+
+class DefaultHandler(YasHandler):
     '''
     YasHandlers, when registered with a Yas installation in the active yas.yml,
     are tested against, and upon matching applied to, incoming messages by Yas
