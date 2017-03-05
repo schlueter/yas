@@ -26,7 +26,6 @@ class DefaultHandler(YasHandler):
             channel, and objects originating from the bot. The implementation of this
             behaviour is likely to change in the future, but the default filters are not.
         '''
-        self.log('INFO', f"Testing {data['yas_hash']} against {self.__class__}")
         return True
 
     def handle(self, data, reply):
@@ -60,5 +59,4 @@ class DefaultHandler(YasHandler):
             listeners may be registered. This argument may be replaced in the future with
             something more explicit.
         '''
-        self.log('INFO', f"Handling {data['yas_hash']} with {self.__class__}")
         reply(config.default_response)
