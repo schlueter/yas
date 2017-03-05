@@ -2,7 +2,7 @@ import imp
 import inspect
 import sys
 
-from yas import YasHandler, NotAHandler
+from yas import YasHandler, NotAHandler, HandlerError
 from yas.logging import log
 
 
@@ -34,13 +34,12 @@ def is_handler(test_class):
 
     class_derives_yas_handler = str(YasHandler) in [str(base) for base in test_class.__bases__]
     class_defines_required_methods = 'handle' in public_methods and 'test' in public_methods
-    log.info(f"{test_class.__bases__}")
     log.info(f"{'✔' if class_derives_yas_handler else '✘'} {test_class} derives {YasHandler}")
     log.info(f"{'✔' if class_defines_required_methods else '✘'} {test_class} defines required methods")
     return class_derives_yas_handler and class_defines_required_methods
 
 def find_handlers_in_module(handler_module):
-    return [handler[1] for handler in inspect.getmembers(handler_module, inspect.isclass)
+    return [handler[1]() for handler in inspect.getmembers(handler_module, inspect.isclass)
             if is_handler(handler[1])]
 
 class HandlerManager:
@@ -56,7 +55,7 @@ class HandlerManager:
                 handler = import_from_dotted_path(handler_name)
                 if type(handler) is type and is_handler(handler):
                     log.info(f"Found handler {handler}.")
-                    self.handler_list.append(handler)
+                    self.handler_list.append(handler())
                     continue
 
                 module_handlers = find_handlers_in_module(handler)
@@ -74,21 +73,11 @@ class HandlerManager:
 
         log.info(f'Loaded handlers: {self.handler_list}')
 
-    def handle(self, data, reply, api_call):
+    def handle(self, data, reply):
+        log.info(f"Handling {data['yas_hash']}")
         for handler in self.handler_list:
-            log(f'Testing {data} against {handler}')
-            try:
-                if handler.test(data):
-                    log(f'being handled by {handler}')
-                    try:
-                        handler.handle(data, reply, api_call, self)
-                    except Exception as e:
-                        message = f'The handler {handler} raised an error when handling {data}: {e}'
-                        log(message)
-                        reply(message)
-                    break
-            except Exception as e:
-                log(f'The handler {handler} raised an error when considering {data}: {e}'
-                raise e
+            if handler.test(data):
+                handler.handle(data, reply)
+            break
         else:
             log.info(f'No handler found for {data}')

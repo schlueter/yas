@@ -1,5 +1,6 @@
 from yas import YasHandler, HandlerError
 from yas.yaml_file_config import YamlConfiguration as Config
+from yas.logging import log
 
 
 class DefaultHandler(YasHandler):
@@ -24,9 +25,10 @@ class DefaultHandler(YasHandler):
             channel, and objects originating from the bot. The implementation of this
             behaviour is likely to change in the future, but the default filters are not.
         '''
+        log.info(f"Testing {data['yas_hash']} against {self.__class__}")
         return True
 
-    def handle(self, data, reply, api_call, handler_manager):
+    def handle(self, data, reply):
         '''
         Handles a matched data object. If a HandlerError is raised here, it will be caught,
         and its message sent to the originating channel; other errors are not caught and
@@ -57,5 +59,6 @@ class DefaultHandler(YasHandler):
             listeners may be registered. This argument may be replaced in the future with
             something more explicit.
         '''
-
-        raise HandlerError("Sure...write some more code then I can do that!")
+        config = Config()
+        log.info(f"Handling {data['yas_hash']} with {self.__class__}")
+        reply(config.default_response)

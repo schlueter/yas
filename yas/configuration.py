@@ -5,5 +5,6 @@ PARAMETERS = dict(
     slack_app_token=None,
     bot_name=None,
     handler_list=['yas.default_handler'],
-    debug=False
+    debug=False,
+    default_response='Sure...write some more code then I can do that!'
 )

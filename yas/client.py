@@ -1,9 +1,15 @@
+import hashlib
+
 from slackclient import SlackClient
 
-from yas import SlackClientFailure, NoBot
+from yas import SlackClientFailure, NoBot, HandlerError
 from yas.handler_manager import HandlerManager
 from yas.logging import log
 from yas.yaml_file_config import YamlConfiguration
+
+
+def hash(string):
+    return hashlib.md5(str(string).encode('utf-8')).hexdigest()
 
 
 class Client(SlackClient):
@@ -11,7 +17,6 @@ class Client(SlackClient):
     def __init__(self, data_filter=None, ignored_types=None):
         self.config = YamlConfiguration()
 
-        log.info(f"Slack application token is {self.config.slack_app_token}")
         super().__init__(self.config.slack_app_token)
 
         self.bot_id = self.__retrieve_bot_user_id()
@@ -21,8 +26,6 @@ class Client(SlackClient):
         self.ignored_types = ignored_types or self.config.ignored_types
 
         self.handler_manager = HandlerManager(self.config.handler_list, debug=self.config.debug)
-        log.info(self)
-        log.info(self.__dict__)
 
     def __retrieve_bot_user_id(self):
         log.info("Retrieving users list for self identification...")
@@ -40,16 +43,17 @@ class Client(SlackClient):
 
     def process_changes(self, data):
         super().process_changes(data)
+        log.debug(f"Raw data: {data}")
         if self.data_filter(self, data):
-            log.info(f'Processing: {data}')
             channel = data.get('channel')
             def reply(message, channel=channel, thread=None, reply_broadcast=None):
                 self.rtm_send_message(channel, message, thread, reply_broadcast)
+            data['yas_hash'] = hash(data)
+            log.info(f"Processing: {data}")
             try:
-                self.handler_manager.handle(data, reply, self.api_call)
-            except HandlerError as e:
-                self.rtm_send_message(channel, str(e))
-                # self.rtm_send_message(channel, "Sure...write some more code then I can do that!")
+                self.handler_manager.handle(data, reply)
+            except Exception as exception:
+                reply(f"Err, sorry, that threw an exception: {exception}. Try again or reach out to the maintainers.")
 
     def listen(self):
         if self.rtm_connect():
