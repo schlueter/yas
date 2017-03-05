@@ -6,5 +6,6 @@ PARAMETERS = dict(
     bot_name=None,
     handler_list=['yas.default_handler'],
     debug=False,
-    default_response='Sure...write some more code then I can do that!'
+    default_response='Sure...write some more code then I can do that!',
+    log_level='WARN'
 )

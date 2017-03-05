@@ -1,14 +1,17 @@
 from yas import YasHandler, HandlerError
-from yas.yaml_file_config import YamlConfiguration as Config
-from yas.logging import log
+from yas.yaml_file_config import YamlConfiguration
+from yas.logging import Logger
 
 
-class DefaultHandler(YasHandler):
+class DefaultHandler(YasHandler, YamlConfiguration):
     '''
     YasHandlers, when registered with a Yas installation in the active yas.yml,
     are tested against, and upon matching applied to, incoming messages by Yas
     as they are receieved.
     '''
+    def __init__(self):
+        super(YasHandler).__init__()
+        self.logger = Logger(self.log_level)
 
     def test(self, data):
         '''
