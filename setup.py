@@ -1,7 +1,7 @@
 # Copyright 2017 Brandon Schlueter
 
-import setuptools
+from setuptools import setup
 
-setuptools.setup(
+setup(
     setup_requires=['pbr>=1.8'],
     pbr=True)
