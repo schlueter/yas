@@ -4,7 +4,7 @@ import sys
 
 from yas import YasHandler, NotAHandler, HandlerError
 from yas.yaml_file_config import YamlConfiguration
-from yas.logging import logger
+from yas.logging import logger, log
 
 
 config = YamlConfiguration()
@@ -27,22 +27,36 @@ def import_from_dotted_path(dotted_names, path=None):
 
     return import_from_dotted_path(remaining_names, path=module.__path__)
 
+def get_bases(target_class):
+    bases = []
+    if target_class is not object:
+        for base in target_class.__bases__:
+            bases.extend(get_bases(base))
+
+
+    bases.extend(target_class.__bases__)
+    return bases
+
 def is_handler(test_class):
     logger.log.info(f"Checking if {test_class} is a handler")
-    public_methods = [
-        member[0] for member in inspect.getmembers(test_class)
-        if not member[0].startswith('__')
-    ]
+    public_methods = [member[0] for member in inspect.getmembers(test_class)
+                      if not member[0].startswith('__')]
 
-    logger.log.debug(f"{test_class} has bases {test_class.__bases__}")
-    class_derives_yas_handler = str(YasHandler) in [str(base) for base in test_class.__bases__]
+    test_class_bases = get_bases(test_class)
+    logger.log.debug(f"{test_class} has bases {test_class_bases}")
+
+    class_derives_yas_handler = str(YasHandler) in [str(base) for base in test_class_bases]
     class_defines_required_methods = 'handle' in public_methods and 'test' in public_methods
-    logger.log.info(f"{'✔' if class_derives_yas_handler else '✘'} {test_class} derives {YasHandler}")
-    logger.log.info(f"{'✔' if class_defines_required_methods else '✘'} {test_class} defines required methods")
+
+    check_or_x = {True: '✔', False: '✘'}
+
+    logger.log.info(f"{check_or_x[class_derives_yas_handler]} {test_class} derives {YasHandler}")
+    logger.log.info(f"{check_or_x[class_defines_required_methods]} {test_class} defines required methods")
+
     return class_derives_yas_handler and class_defines_required_methods
 
 def find_handlers_in_module(handler_module):
-    return [handler[1]() for handler in inspect.getmembers(handler_module, inspect.isclass)
+    return [handler[1](log=log) for handler in inspect.getmembers(handler_module, inspect.isclass)
             if is_handler(handler[1])]
 
 class HandlerManager:
@@ -58,7 +72,7 @@ class HandlerManager:
                 handler = import_from_dotted_path(handler_name)
                 if type(handler) is type and is_handler(handler):
                     logger.log.info(f"Found handler {handler}.")
-                    self.handler_list.append(handler())
+                    self.handler_list.append(handler(log=log))
                     continue
 
                 module_handlers = find_handlers_in_module(handler)

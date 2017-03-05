@@ -13,3 +13,7 @@ class Logger:
         self.log.setLevel(logging._nameToLevel[log_level])
 
 logger = Logger(config.log_level)
+
+def log(level_str, msg):
+    level = logging._nameToLevel[level_str]
+    logger.log(level, msg)

@@ -1,11 +1,14 @@
 from yas.yaml_file_config import YamlConfiguration
-from yas.logging import logger
+from yas.logging import logger, log
 
+
+class YasHandler:
+    def __init__(self, log=log):
+        self.log = log
 
 class YasError(Exception):
     def __init__(self, msg):
-        self.logger = Logger(self.log_level)
-        log.fatal(msg)
+        logger.log.fatal(msg)
 
 class HandlerError(YasError):
     def __init__(msg):
@@ -22,7 +25,3 @@ class NoBot(SlackClientFailure):
 class NotAHandler(HandlerError):
     def __init__(self, not_a_handler):
         super().__init__(f"{not_a_handler} is not a handler.")
-
-class YasHandler:
-    pass
-
