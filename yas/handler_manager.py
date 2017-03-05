@@ -2,9 +2,9 @@ import imp
 import inspect
 import sys
 
+from yas import YasHandler, NotAHandler, HandlerError
+from yas.logging import logger, log
 
-def log(*msg):
-    print(*msg, file=sys.stderr)
 
 def import_from_dotted_path(dotted_names, path=None):
     """ import_from_dotted_path('foo.bar') -> from foo import bar; return bar
@@ -24,51 +24,75 @@ def import_from_dotted_path(dotted_names, path=None):
 
     return import_from_dotted_path(remaining_names, path=module.__path__)
 
-def is_valid_handler(handler):
-    public_methods = [
-        member[0] for member in inspect.getmembers(test_class)
-        if not member[0].startswith('__')
-    ]
+def get_ancestors(target_class):
+    bases = []
+    if target_class is not object:
+        for base in target_class.__bases__:
+            bases.extend(get_ancestors(base))
 
-    class_inherits_yas_handler = YasHandler in test_class.__bases__
+    bases.extend(target_class.__bases__)
+    return bases
+
+def is_handler(test_class):
+    logger.log.info(f"Checking if {test_class} is a handler")
+    public_methods = [member[0] for member in inspect.getmembers(test_class)
+                      if not member[0].startswith('__')]
+
+    test_class_bases = get_ancestors(test_class)
+    logger.log.debug(f"{test_class} has bases {test_class_bases}")
+
+    class_derives_yas_handler = str(YasHandler) in [str(base) for base in test_class_bases]
     class_defines_required_methods = 'handle' in public_methods and 'test' in public_methods
 
-    return class_inherits_yas_handler and class_defines_required_methods
+    check_or_x = {True: '✔', False: '✘'}
 
-class Handler:
+    logger.log.info(f"{check_or_x[class_derives_yas_handler]} {test_class} derives {YasHandler}")
+    logger.log.info(f"{check_or_x[class_defines_required_methods]} {test_class} defines required methods")
 
-    def __init__(self, handler_class):
-        self.handler_class = import_from_dotted_path(handler_class)
-        self.instance = self.handler_class()
-        self.test = self.instance.test
-        self.handle = self.instance.handle
+    return class_derives_yas_handler and class_defines_required_methods
 
+def find_handlers_in_module(handler_module):
+    return [handler[1](log=log) for handler in inspect.getmembers(handler_module, inspect.isclass)
+            if is_handler(handler[1])]
 
 class HandlerManager:
-    def __init__(self, handler_list):
+    def __init__(self, handler_list, debug=False):
+
+        logger.log.info(f"Loading handlers from {handler_list}")
+
         self.handler_list = []
-        for handler_class in handler_list:
+        for handler_name in handler_list:
+            logger.log.info(f"Searching for {handler_name}")
             try:
-                self.handler_list.append(Handler(handler_class))
-            except Exception as e:
-                log(f'Failed to load handler {handler_class}, caught: {e}')
 
+                handler = import_from_dotted_path(handler_name)
+                if type(handler) is type and is_handler(handler):
+                    logger.log.info(f"Found handler {handler}.")
+                    self.handler_list.append(handler(log=log))
+                    continue
 
-    def handle(self, data, reply, api_call):
+                module_handlers = find_handlers_in_module(handler)
+                if module_handlers:
+                    logger.log.info(f"Found handlers in {handler_name}: {module_handlers}")
+                    self.handler_list.extend(module_handlers)
+                    continue
+
+                raise NotAHandler(handler_name)
+
+            except Exception as exception:
+                logger.log.warn(f'Failed to load handler {handler_name}, caught: {exception}')
+                if debug:
+                    raise exception
+
+        logger.log.info(f'Loaded handlers: {self.handler_list}')
+
+    def handle(self, data, reply):
+        logger.log.info(f"Handling {data['yas_hash']}")
         for handler in self.handler_list:
-            log(f'Testing {data} against {handler}')
-            try:
-                if handler.test(data):
-                    log(f'being handled by {handler}')
-                    try:
-                        handler.handle(data, reply, api_call, self)
-                    except Exception as e:
-                        message = f'The handler {handler} raised an error when handling {data}: {e}'
-                        log(message)
-                        reply(message)
-                    break
-            except Exception as e:
-                log(f'The handler {handler} raised an error when considering {data}: {e}'
-                raise e
+            logger.log.info(f"Testing {data['yas_hash']} against {handler}")
+            if handler.test(data):
+                logger.log.info(f"Handling {data['yas_hash']} with {handler}")
+                handler.handle(data, reply)
+                break
         else:
-            log(f'No handler found for {data}')
+            logger.log.info(f'No handler found for {data}')

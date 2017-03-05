@@ -1,6 +1,10 @@
-from yas.errors import HandlerError
+from yas import YasHandler, HandlerError
+from yas.yaml_file_config import YamlConfiguration
 
-class YasHandler:
+
+config = YamlConfiguration()
+
+class DefaultHandler(YasHandler):
     '''
     YasHandlers, when registered with a Yas installation in the active yas.yml,
     are tested against, and upon matching applied to, incoming messages by Yas
@@ -24,7 +28,7 @@ class YasHandler:
         '''
         return True
 
-    def handle(self, data, reply, api_call, handler_manager):
+    def handle(self, data, reply):
         '''
         Handles a matched data object. If a HandlerError is raised here, it will be caught,
         and its message sent to the originating channel; other errors are not caught and
@@ -55,5 +59,4 @@ class YasHandler:
             listeners may be registered. This argument may be replaced in the future with
             something more explicit.
         '''
-
-        raise HandlerError("Sure...write some more code then I can do that!")
+        reply(config.default_response)

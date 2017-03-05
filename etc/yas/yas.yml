@@ -1,0 +1,18 @@
+---
+# A Slack app token for a bot user
+# go to https://my.slack.com/services/new/bot to create one
+slack_app_token: xoxb-xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx
+# Your bot's name
+bot_name: yas
+# A list of ignored data types. This reduces the number of data events which
+# are tested against the handlers.
+ignored_types: [ desktop_notification, user_typing ]
+
+# The list of handlers yas will test against incoming data events
+handler_list: [ yas.default_handler. ]
+
+# The default handler is a catch all which replys with the
+# default response defined here. As a catch all, it should always be
+# the last handler in the list, or else it'll catch everything before
+# any other handlers are checked.
+default_response: Sure...write some more code then I can do that!

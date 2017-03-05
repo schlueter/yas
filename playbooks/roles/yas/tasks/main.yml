@@ -12,6 +12,14 @@
     state=latest
     executable={{ pip_executable }}
 
+
+- name: Set slack_app_token if provided
+  lineinfile:
+    dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
+    regexp: '^slack_app_token: '
+    line: "slack_app_token: {{ slack_app_token }}"
+  when: slack_app_token is defined
+
 - name: Install yas systemd service
   copy:
     src={{ local_repository }}/yas.service
