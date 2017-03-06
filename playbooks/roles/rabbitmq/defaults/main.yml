@@ -1,8 +1,0 @@
----
-log_level: info
-default_user: guest
-default_password: guest
-mem_watermark: 0.4
-erlang_cookie: BADCOOKIE
-plugins:
-  - rabbitmq_management

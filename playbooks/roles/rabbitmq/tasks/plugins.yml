@@ -1,4 +1,0 @@
----
-- name: Install plugins
-  rabbitmq_plugin: names={{ item }} state=enabled
-  with_items: "{{ plugins }}"

@@ -16,3 +16,6 @@ handler_list: [ yas.default_handler. ]
 # the last handler in the list, or else it'll catch everything before
 # any other handlers are checked.
 default_response: Sure...write some more code then I can do that!
+
+log_level: INFO
+debug: no

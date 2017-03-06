@@ -1,7 +1,0 @@
----
-- name: Install RabbitMQ
-  apt:
-    pkg=rabbitmq-server
-    state=latest
-    cache_valid_time=1800
-    update_cache=yes

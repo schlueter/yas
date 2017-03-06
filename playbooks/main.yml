@@ -11,3 +11,13 @@
   gather_facts: yes
   become: yes
   roles: [ yas ]
+  tasks:
+    - name: Put some useful things in bash history
+      copy:
+        dest: /home/ubuntu/.bash_history
+        owner: ubuntu
+        group: ubuntu
+        content: |
+          pip install -U /vagrant
+          sed -Ei 's/(slack_app_token: ).*/\1{{ slack_app_token }}/' /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
+          sudo systemctl restart yas

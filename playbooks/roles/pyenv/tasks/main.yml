@@ -7,7 +7,7 @@
     path=/usr/local/lib/pyenv
     group=pyenv
     recurse=yes
-    mode=3775
+    mode=2775
     state=directory
 
 - name: Clone pyenv
@@ -31,8 +31,8 @@
 
 - name: Update global PATH with pyenv bin
   lineinfile:
-    line='PATH="/usr/local/lib/pyenv/bin:\1'
-    regexp='^PATH="(?!/usr/local/lib/pyenv/bin:)(.*)'
+    regexp='(^PATH=")(?!/usr/local/lib/pyenv/bin:)(.*)'
+    line='\1/usr/local/lib/pyenv/bin:\2'
     backrefs=yes
     dest=/etc/environment
 
@@ -61,6 +61,7 @@
   command: ls /usr/local/lib/pyenv/versions
   register: versions
   changed_when: no
+  ignore_errors: yes
 
 - name: Install some pythons
   command: /usr/local/lib/pyenv/bin/pyenv install {{ item }}
