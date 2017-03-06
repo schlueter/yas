@@ -9,7 +9,14 @@ bot_name: yas
 ignored_types: [ desktop_notification, user_typing ]
 
 # The list of handlers yas will test against incoming data events
-handler_list: [ yas.default_handler. ]
+handler_list:
+  - yas.ignored_types_handler.
+  - yas.not_talking_to_bot_handler.
+  # Add your handlers after the ignored types and not talking to bot
+  # handlers and before the default handler unless you know what you're doing.
+  # - my_custom_handler.
+  - yas.default_handler.
+
 
 # The default handler is a catch all which replys with the
 # default response defined here. As a catch all, it should always be

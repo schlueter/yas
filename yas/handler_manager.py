@@ -2,7 +2,7 @@ import imp
 import inspect
 import sys
 
-from yas import YasHandler, NotAHandler, HandlerError
+from yas import YasHandler
 from yas.logging import logger, log
 
 
@@ -52,47 +52,66 @@ def is_handler(test_class):
     return class_derives_yas_handler and class_defines_required_methods
 
 def find_handlers_in_module(handler_module):
-    return [handler[1](log=log) for handler in inspect.getmembers(handler_module, inspect.isclass)
+    return [handler[1] for handler in inspect.getmembers(handler_module, inspect.isclass)
             if is_handler(handler[1])]
 
+def instantiate_handlers(debug, handler_classes, bot_name, api_call, log):
+    handlers = []
+    for handler_class in handler_classes:
+        try:
+            new_handler = handler_class(bot_name, api_call, log)
+            handlers.append(new_handler)
+        except Exception as exception:
+            logger.log.error(f'Failed to load handler {handler_class}, caught: {exception}')
+            if debug:
+                raise exception
+    return handlers
+
 class HandlerManager:
-    def __init__(self, handler_list, debug=False):
+    def __init__(self, handler_list, bot_name, api_call, debug=False):
+
+        self.debug = debug
+        self.bot_name = bot_name
+        self.api_call = api_call
 
         logger.log.info(f"Loading handlers from {handler_list}")
 
-        self.handler_list = []
+        handler_class_list = []
         for handler_name in handler_list:
+
             logger.log.info(f"Searching for {handler_name}")
-            try:
+            handler = import_from_dotted_path(handler_name)
 
-                handler = import_from_dotted_path(handler_name)
-                if type(handler) is type and is_handler(handler):
-                    logger.log.info(f"Found handler {handler}.")
-                    self.handler_list.append(handler(log=log))
-                    continue
+            if type(handler) is type and is_handler(handler):
+                logger.log.info(f"Found handler {handler}.")
+                handler_class_list.append(handler)
+                continue
 
-                module_handlers = find_handlers_in_module(handler)
-                if module_handlers:
-                    logger.log.info(f"Found handlers in {handler_name}: {module_handlers}")
-                    self.handler_list.extend(module_handlers)
-                    continue
+            module_handlers = find_handlers_in_module(handler)
+            if module_handlers:
+                logger.log.info(f"Found handlers in {handler_name}: {module_handlers}")
+                handler_class_list.extend(module_handlers)
+                continue
 
-                raise NotAHandler(handler_name)
+            logger.log.warn(f"{handler_name} is not a handler.")
 
-            except Exception as exception:
-                logger.log.warn(f'Failed to load handler {handler_name}, caught: {exception}')
-                if debug:
-                    raise exception
-
+        self.handler_list = instantiate_handlers(self.debug,
+                                                 handler_class_list,
+                                                 self.bot_name,
+                                                 self.api_call,
+                                                 log)
         logger.log.info(f'Loaded handlers: {self.handler_list}')
 
     def handle(self, data, reply):
-        logger.log.info(f"Handling {data['yas_hash']}")
         for handler in self.handler_list:
             logger.log.info(f"Testing {data['yas_hash']} against {handler}")
             if handler.test(data):
                 logger.log.info(f"Handling {data['yas_hash']} with {handler}")
-                handler.handle(data, reply)
+                try:
+                    handler.handle(data, reply)
+                except Exception as exception:
+                    logger.log.error(f"Caught {exception} while handling {data['yas_hash']} with {handler}")
+                    raise exception
                 break
         else:
             logger.log.info(f'No handler found for {data}')
