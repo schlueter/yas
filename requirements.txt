@@ -2,4 +2,3 @@ pbr>=1.10.0
 pylint>=1.6.5
 slackclient>=1.0.5
 PyYAML>=3.12
-systemd>=0.9.7
