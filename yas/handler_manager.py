@@ -1,6 +1,7 @@
 import imp
 import inspect
 import sys
+import traceback
 
 from yas import YasHandler
 from yas.logging import logger, log
@@ -62,7 +63,7 @@ def instantiate_handlers(debug, handler_classes, bot_name, api_call, log):
             new_handler = handler_class(bot_name, api_call, log)
             handlers.append(new_handler)
         except Exception as exception:
-            logger.log.error(f'Failed to load handler {handler_class}, caught: {exception}')
+            logger.log.error(f'Failed to load handler {handler_class}, caught:\n{traceback.format_exc()}')
             if debug:
                 raise exception
     return handlers
@@ -110,7 +111,7 @@ class HandlerManager:
                 try:
                     handler.handle(data, reply)
                 except Exception as exception:
-                    logger.log.error(f"Caught {exception} while handling {data['yas_hash']} with {handler}")
+                    logger.log.error(f"Caught {exception} while handling {data['yas_hash']} with {handler}:\n{traceback.format_exc()}")
                     raise exception
                 break
         else:
