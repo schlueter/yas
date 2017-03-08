@@ -28,28 +28,22 @@ class NotTalkingToBotHandler(YasHandler):
 
 
     def test(self, data):
+
+        # @message the bot
+        if self.at_bot in data['text']:
+            self.log('DEBUG', f"Message contained {self.at_bot}, {data['yas_hash']}")
+            return False
+
         channel = data.get('channel')
         channel_info = self.api_call('channels.info', channel=channel)
-
-        # Public channel
-        if channel_info.get('ok') and not self.at_bot in data['text']:
-            self.log('DEBUG', f"Message contained {self.at_bot}, {data['yas_hash']}")
-            return True
-
         group_info = self.api_call('groups.info', channel=channel)
 
         # Direct message
         if not channel_info.get('ok') and not group_info.get('ok'):
             self.log('DEBUG', f"Direct message to bot, {data['yas_hash']}")
-            return True
+            return False
 
-        # Private channel
-        if not channel_info.get('ok') and group_info.get('ok'):
-            self.log('DEBUG', f"Direct message to bot, {data['yas_hash']}")
-            return True
-
-        self.log('DEBUG', f"Apparently talking to bot {data['yas_hash']}.\nChannel_info: {channel_info}\nGroup_info: {group_info}")
-        return False
+        return True
 
     def handle(self, data, _):
         pass
