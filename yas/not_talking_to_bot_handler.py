@@ -38,6 +38,9 @@ class NotTalkingToBotHandler(YasHandler):
             self.log('DEBUG', f"Direct message to bot, {data['yas_hash']}")
             return True
 
+        self.log('DEBUG', f"Apparently talking to bot {data['yas_hash']}.\nChannel_info: {channel_info}\nGroup_info: {group_info}")
+        return False
+
     def handle(self, data, _):
         pass
 
