@@ -19,5 +19,5 @@
         group: ubuntu
         content: |
           pip install -U /vagrant
-          sed -Ei 's/(slack_app_token: ).*/\1{{ slack_app_token }}/' /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
+          sed -Ei 's/(slack_app_token: ).*/\1{{ slack_app_token | default('THIS WONT WORK') }}/' /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
           sudo systemctl restart yas
