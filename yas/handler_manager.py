@@ -104,6 +104,7 @@ class HandlerManager:
         logger.log.info(f'Loaded handlers: {self.handler_list}')
 
     def handle(self, data, reply):
+        logger.log.debug(f"Handling {data}")
         for handler in self.handler_list:
             logger.log.debug(f"Testing {data['yas_hash']} against {handler}")
             if handler.test(data):
