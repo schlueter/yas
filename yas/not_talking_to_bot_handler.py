@@ -6,7 +6,7 @@ config = YamlConfiguration()
 
 class NotTalkingToBotHandler(YasHandler):
 
-    def __init__(self, bot_name, api_call=None, log=None):
+    def __init__(self, bot_name, api_call, log=None):
         super().__init__(bot_name, api_call, log=log)
         self.bot_id = self.__retrieve_bot_user_id()
         self.at_bot = "<@" + self.bot_id + ">"
