@@ -30,7 +30,7 @@ class NotTalkingToBotHandler(YasHandler):
     def test(self, data):
 
         # @message the bot
-        if self.at_bot in data['text']:
+        if self.at_bot in data.get('text'):
             self.log('DEBUG', f"Message contained {self.at_bot}, {data['yas_hash']}")
             return False
 
