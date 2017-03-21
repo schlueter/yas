@@ -57,5 +57,3 @@ class SlackClientFailure(HandlerError):
 class NoBot(SlackClientFailure):
     def __init__(self, bot_name):
         super().__init__(f"Could not find bot user with the name {bot_name}, please check your yas config.")
-
-

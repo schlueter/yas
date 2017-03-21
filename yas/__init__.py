@@ -13,5 +13,5 @@ class YasError(Exception):
         logger.log.fatal(msg)
 
 class HandlerError(YasError):
-    def __init__(msg):
-        super().__init__(msg)
+    def __init__(self, msg):
+        logger.log.warn(msg)
