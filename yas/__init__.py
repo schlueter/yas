@@ -1,3 +1,5 @@
+import re
+
 from yas.yaml_file_config import YamlConfiguration
 from yas.logging import logger, log
 
