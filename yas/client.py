@@ -2,6 +2,8 @@ import hashlib
 from threading import Thread
 import time
 
+from multiprocessing import Process
+
 from slackclient import SlackClient
 
 from yas.handler_manager import HandlerManager
@@ -37,7 +39,7 @@ class Client(SlackClient):
         data['yas_hash'] = hash(data)
         logger.log.info(f"Processing: {data}")
         try:
-            self.handler_manager.handle(data, reply)
+            Process(self.handler_manager.handle, args=(data, reply))
         except Exception as exception:
             reply(config.handler_exception_message.format(exception=exception))
 
