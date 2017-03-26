@@ -1,4 +1,5 @@
 import hashlib
+from threading import Thread
 
 from slackclient import SlackClient
 
@@ -35,7 +36,8 @@ class Client(SlackClient):
         data['yas_hash'] = hash(data)
         logger.log.info(f"Processing: {data}")
         try:
-            self.handler_manager.handle(data, reply)
+            handler = Thread(self.handler_manager.handle, args=(data, reply))
+            handler.start()
         except Exception as exception:
             reply(f"Err, sorry, that threw an exception: {exception}. Try again or reach out to the maintainers.")
 

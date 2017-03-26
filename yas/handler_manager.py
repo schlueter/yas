@@ -2,7 +2,6 @@ import imp
 import inspect
 import sys
 import traceback
-from multiprocessing import Process
 
 from yas import YasHandler
 from yas.logging import logger, log
@@ -111,7 +110,7 @@ class HandlerManager:
             if handler.test(data):
                 logger.log.info(f"Handling {data['yas_hash']} with {handler}")
                 try:
-                    Process(name=data['yas_hash'], target=handler.handle, args=(data, reply)).start()
+                    handler.handle(data, reply)
                 except Exception as exception:
                     logger.log.error(f"Caught {exception} while handling {data['yas_hash']} with {handler}:\n{traceback.format_exc()}")
                     raise exception
