@@ -37,7 +37,8 @@ class Client(SlackClient):
         data['yas_hash'] = hash(data)
         logger.log.info(f"Processing: {data}")
         try:
-            self.handler_manager.handle(data, reply)
+            handler = Thread(self.handler_manager.handle, args=(data, reply))
+            handler.start()
         except Exception as exception:
             reply(config.handler_exception_message.format(exception=exception))
 
