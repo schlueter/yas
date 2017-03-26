@@ -2,7 +2,6 @@ import imp
 import inspect
 import sys
 import traceback
-from multiprocessing import Process
 
 from yas import YasHandler
 from yas.logging import logger, log
