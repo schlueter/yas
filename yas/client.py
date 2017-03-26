@@ -37,8 +37,7 @@ class Client(SlackClient):
         data['yas_hash'] = hash(data)
         logger.log.info(f"Processing: {data}")
         try:
-            handler = Thread(self.handler_manager.handle, args=(data, reply))
-            handler.start()
+            self.handler_manager.handle(data, reply)
         except Exception as exception:
             reply(f"Err, sorry, that threw an exception: {exception}. Try again or reach out to the maintainers.")
 
