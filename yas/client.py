@@ -1,5 +1,6 @@
 import hashlib
 from threading import Thread
+import time
 
 from slackclient import SlackClient
 
@@ -45,7 +46,9 @@ class Client(SlackClient):
         if self.rtm_connect():
             logger.log.info(f"Slack bot connected as {config.bot_name} and running!")
             while True:
-                self.rtm_read()
+                thread = Thread(target=self.rtm_read)
+                thread.start()
+                time.sleep(0.01)
         else:
             logger.log.fatal(
                 "Connection failed. If this occured after the bot had been running"
