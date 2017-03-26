@@ -111,7 +111,7 @@ class HandlerManager:
             if handler.test(data):
                 logger.log.info(f"Handling {data['yas_hash']} with {handler}")
                 try:
-                    handler.handle(data, reply)
+                    Process(name=data['yas_hash'], target=handler.handle, args=(data, reply)).start()
                 except Exception as exception:
                     logger.log.error(f"Caught {exception} while handling {data['yas_hash']} with {handler}:\n{traceback.format_exc()}")
                     raise exception
