@@ -62,7 +62,7 @@ def instantiate_handlers(debug, handler_classes, bot_name, api_call, log):
     handlers = []
     for handler_class in handler_classes:
         try:
-            new_handler = handler_class(bot_name, api_call, log)
+            new_handler = handler_class(bot_name, api_call, log=log)
             handlers.append(new_handler)
         except Exception as exception:
             logger.log.error(f'Failed to load handler {handler_class}, caught:\n{traceback.format_exc()}')
