@@ -39,6 +39,8 @@ def is_handler(test_class):
     public_methods = [member[0] for member in inspect.getmembers(test_class)
                       if not member[0].startswith('__')]
 
+    logger.log.debug(f'{test_class} defines methods {public_methods}')
+
     test_class_bases = get_ancestors(test_class)
     logger.log.debug(f"{test_class} has bases {test_class_bases}")
 
