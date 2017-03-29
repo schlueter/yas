@@ -39,7 +39,7 @@ class Client(SlackClient):
         try:
             self.handler_manager.handle(data, reply)
         except Exception as exception:
-            reply(f"Err, sorry, that threw an exception: {exception}. Try again or reach out to the maintainers.")
+            reply(config.handler_exception_message.format(exception=exception))
 
     def listen(self):
         if self.rtm_connect():
