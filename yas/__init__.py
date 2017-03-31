@@ -10,9 +10,9 @@ class YasHandler:
         self.bot_name = bot_name
         self.api_call = api_call
         self.log = log
-        self.all_users = self.__retrieve_users_list()
+        self.all_users = self._retrieve_users_list()
 
-    def __retrieve_users_list(self):
+    def _retrieve_users_list(self):
         self.log("INFO", "Retrieving users list...")
         api_call = self.api_call("users.list")
         if not api_call.get('ok'):
@@ -26,7 +26,7 @@ class YasHandler:
         else:
             raise NoSuchUser(self.bot_name)
 
-    def __get_user_info(self, user_id):
+    def _retrieve_user_info(self, user_id):
         try:
             creator_info = self.api_call('users.info', user=user_id)
         except Exception as e:

@@ -1,6 +1,7 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
   config.vm.network "forwarded_port", guest: 15672, host: 25672
+  config.vm.synced_folder "../YasOpenStackHandler", "/srv/YasOpenStackHandler"
   ansible_extra_vars = {}
   ansible_extra_vars['local_repository'] = '/vagrant'
   ansible_extra_vars['log_level'] = ENV['LOG_LEVEL'] || 'INFO'
