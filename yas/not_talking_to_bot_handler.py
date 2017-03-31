@@ -8,7 +8,7 @@ class NotTalkingToBotHandler(YasHandler):
 
     def __init__(self, bot_name, api_call, log=None):
         super().__init__(bot_name, api_call, log=log)
-        self.bot_id = self.__retrieve_user_id(self.bot_name)
+        self.bot_id = self._retrieve_user_id(self.bot_name)
         self.at_bot = "<@" + self.bot_id + ">"
         self.api_call = api_call
 

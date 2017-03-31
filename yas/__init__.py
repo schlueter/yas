@@ -19,7 +19,7 @@ class YasHandler:
             raise SlackClientFailure("Unable to query api! This is usually due to an incorrect api key, please check your yas config.")
         return api_call.get('members')
 
-    def __retrieve_user_id(self, username):
+    def _retrieve_user_id(self, username):
         for user in self.all_users:
             if 'name' in user and user.get('name') == username:
                 return user.get('id')
