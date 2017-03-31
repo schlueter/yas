@@ -9,6 +9,10 @@ Vagrant.configure("2") do |config|
     ansible_extra_vars['slack_app_token'] = ENV['SLACK_APP_TOKEN']
   end
 
+  if ENV.has_key? 'SLACK_APP_NAME'
+    ansible_extra_vars['slack_app_name'] = ENV['SLACK_APP_NAME']
+  end
+
   config.vm.provision :ansible,
     playbook: "playbooks/main.yml",
     sudo: true,

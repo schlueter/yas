@@ -19,6 +19,13 @@
     line: "slack_app_token: {{ slack_app_token }}"
   when: slack_app_token is defined
 
+- name: Set slack_app_name if provided
+  lineinfile:
+    dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
+    regexp: '^slack_app_name: '
+    line: "bot_name: {{ slack_app_name }}"
+  when: slack_app_name is defined
+
 - name: Set log_level if provided
   lineinfile:
     dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
