@@ -8,24 +8,9 @@ class NotTalkingToBotHandler(YasHandler):
 
     def __init__(self, bot_name, api_call, log=None):
         super().__init__(bot_name, api_call, log=log)
-        self.bot_id = self.__retrieve_bot_user_id()
+        self.bot_id = self.__retrieve_user_id(self.bot_name)
         self.at_bot = "<@" + self.bot_id + ">"
         self.api_call = api_call
-
-    def __retrieve_bot_user_id(self):
-        self.log("INFO", "Retrieving users list for self identification...")
-        api_call = self.api_call("users.list")
-        if api_call.get('ok'):
-            # retrieve all users so we can find our bot
-            users = api_call.get('members')
-            for user in users:
-                if 'name' in user and user.get('name') == self.bot_name:
-                    return user.get('id')
-            else:
-                raise NoBot(self.bot_name)
-        else:
-            raise SlackClientFailure("Unable to query api! This is usually due to an incorrect api key, please check your yas config.")
-
 
     def test(self, data):
 
