@@ -37,16 +37,19 @@ class Client(SlackClient):
         data['yas_hash'] = rough_hash(data)
         logger.log.info(f"Processing: {data}")
         try:
-            self.handler_manager.handle(data, reply)
+            thread = Thread(target=self.handler_manager.handle, args=(data, reply))
+            thread.start()
+        # pylint: disable=broad-except
         except Exception as exception:
             reply(CONFIG.handler_exception_message.format(exception=exception))
+            # pylint: disable=raising-bad-type
+            raise exception
 
     def listen(self):
         if self.rtm_connect():
             logger.log.info(f"Slack bot connected as {CONFIG.bot_name} and running!")
             while True:
-                thread = Thread(target=self.rtm_read)
-                thread.start()
+                self.rtm_read()
                 time.sleep(0.01)
         else:
             logger.log.fatal(
