@@ -1,6 +1,6 @@
 import hashlib
-from threading import Thread
 import time
+from threading import Thread
 
 from slackclient import SlackClient
 
@@ -9,23 +9,23 @@ from yas.logging import logger
 from yas.yaml_file_config import YamlConfiguration
 
 
-config = YamlConfiguration()
+CONFIG = YamlConfiguration()
 
-def hash(string):
+def rough_hash(string):
     return hashlib.md5(str(string).encode('utf-8')).hexdigest()
 
 class Client(SlackClient):
 
     def __init__(self, ignored_types=None):
-        super().__init__(config.slack_app_token)
+        super().__init__(CONFIG.slack_app_token)
 
-        self.ignored_types = ignored_types or config.ignored_types
+        self.ignored_types = ignored_types or CONFIG.ignored_types
 
         self.handler_manager = HandlerManager(
-                config.handler_list,
-                config.bot_name,
-                self.api_call,
-                debug=config.debug)
+            CONFIG.handler_list,
+            CONFIG.bot_name,
+            self.api_call,
+            debug=CONFIG.debug)
 
     def process_changes(self, data):
         super().process_changes(data)
@@ -34,16 +34,16 @@ class Client(SlackClient):
         def reply(message, channel=channel, thread=None, reply_broadcast=None):
             if channel:
                 self.rtm_send_message(channel, message, thread, reply_broadcast)
-        data['yas_hash'] = hash(data)
+        data['yas_hash'] = rough_hash(data)
         logger.log.info(f"Processing: {data}")
         try:
             self.handler_manager.handle(data, reply)
         except Exception as exception:
-            reply(config.handler_exception_message.format(exception=exception))
+            reply(CONFIG.handler_exception_message.format(exception=exception))
 
     def listen(self):
         if self.rtm_connect():
-            logger.log.info(f"Slack bot connected as {config.bot_name} and running!")
+            logger.log.info(f"Slack bot connected as {CONFIG.bot_name} and running!")
             while True:
                 thread = Thread(target=self.rtm_read)
                 thread.start()
