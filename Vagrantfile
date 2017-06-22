@@ -1,6 +1,5 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
-  config.vm.network "forwarded_port", guest: 15672, host: 25672
   config.vm.synced_folder "../YasOpenStack", "/srv/YasOpenStack"
   config.vm.synced_folder "../YasExampleHandlers", "/srv/YasExampleHandlers"
   ansible_extra_vars = {}
