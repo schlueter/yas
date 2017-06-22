@@ -7,3 +7,5 @@ Facade.egg-info/
 build/
 yas.env
 /Yas.egg-info/
+/.vagrant
+ubuntu-xenial-16.04-cloudimg-console.log
