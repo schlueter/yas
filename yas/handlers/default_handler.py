@@ -1,8 +1,5 @@
-from yas import YasHandler, HandlerError
-from yas.yaml_file_config import YamlConfiguration
+from yas import YasHandler
 
-
-config = YamlConfiguration()
 
 class DefaultHandler(YasHandler):
     '''
@@ -11,7 +8,7 @@ class DefaultHandler(YasHandler):
     as they are receieved.
     '''
 
-    def test(self, data):
+    def test(self, _):
         '''
         If this method returns truthy, this class's handle method is called with the data.
         By default, this handler is registered with yas. To disable, remove
@@ -28,7 +25,7 @@ class DefaultHandler(YasHandler):
         '''
         return True
 
-    def handle(self, data, reply):
+    def handle(self, _, reply):
         '''
         Handles a matched data object. If a HandlerError is raised here, it will be caught,
         and its message sent to the originating channel; other errors are not caught and
@@ -59,4 +56,4 @@ class DefaultHandler(YasHandler):
             listeners may be registered. This argument may be replaced in the future with
             something more explicit.
         '''
-        reply(config.default_response)
+        reply(self.bot.config.default_response)
