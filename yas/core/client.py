@@ -3,6 +3,7 @@ import time
 from threading import Thread
 
 from slackclient import SlackClient
+from slackclient._server import SlackConnectionError, SlackLoginError
 
 from yas.core.handler_manager import HandlerManager
 from yas.core.logging import Logger
@@ -39,12 +40,13 @@ class Client(SlackClient):
             raise exception
 
     def listen(self):
-        if self.rtm_connect():
+        try:
+            self.rtm_connect()
             self.log.info(f"Slack bot connected as {self.config.bot_name} and running!")
             while True:
                 self.rtm_read()
                 time.sleep(0.01)
-        else:
+        except (SlackConnectionError, SlackLoginError):
             self.log.fatal(
                 "Connection failed. If this occured after the bot had been running "
                 "a while, it was probably just a connection blip; otherwise, confirm "
