@@ -74,3 +74,11 @@
   copy:
     dest=/usr/local/lib/pyenv/version
     content=3.6.0
+
+- name: Ensure the pyenv dir has correct permissions
+  file:
+    path=/usr/local/lib/pyenv
+    group=pyenv
+    recurse=yes
+    mode=2775
+    state=directory
