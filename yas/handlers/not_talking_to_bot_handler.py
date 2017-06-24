@@ -5,8 +5,8 @@ class NotTalkingToBotHandler(YasHandler):
 
     def __init__(self, bot):
         super().__init__(bot)
-        bot_id = self.bot.retrieve_user_id(self.bot.config.bot_name)
-        self.at_bot = "<@" + bot_id + ">"
+        self.bot_id = self.bot.retrieve_user_id(self.bot.config.bot_name)
+        self.at_bot = "<@" + self.bot_id + ">"
 
     def test(self, data):
 
@@ -19,7 +19,7 @@ class NotTalkingToBotHandler(YasHandler):
         group_info = self.bot.api_call('groups.info', channel=channel)
 
         # Direct message
-        if not channel_info.get('ok') and not group_info.get('ok'):
+        if not channel_info.get('ok') and not group_info.get('ok') and not data.get('user') == self.bot_id:
             return False
 
         return True
