@@ -2,6 +2,9 @@ from yas import YasHandler
 
 
 class DefaultHandler(YasHandler):
+    '''The default handler replys to everything with the default response as defined in the bot config'''
+    triggers = ["default"]
+
     '''
     YasHandlers, when registered with a Yas installation in the active yas.yml,
     are tested against, and upon matching applied to, incoming messages by Yas

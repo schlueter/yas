@@ -41,6 +41,7 @@ class HandlerManager:
         self.config = config
         self.api_call = api_call
         self.log = log
+        self.users_list = self.__retrieve_users_list()
         self.log.info(f"Loading handlers from {self.config.handler_list}")
 
         handler_class_list = []
@@ -62,7 +63,9 @@ class HandlerManager:
 
             self.log.warn(f"{handler_name} is not a handler.")
 
-        self.handler_list = self.instantiate_handlers(handler_class_list)
+        self.handler_list = []
+        self.handler_list.extend(self.instantiate_handlers(handler_class_list))
+        self.setup_handlers(self.handler_list)
 
         self.log.info(f'Loaded handlers: {self.handler_list}')
 
@@ -73,16 +76,13 @@ class HandlerManager:
 
     def is_handler(self, test_class):
         self.log.info(f"Checking if {test_class} is a handler")
-        public_methods = [member[0] for member in inspect.getmembers(test_class)
-                          if not member[0].startswith('__')]
-
-        self.log.debug(f'{test_class} defines methods {public_methods}')
+        methods = [member[0] for member in inspect.getmembers(test_class)]
 
         test_class_bases = get_ancestors(test_class)
         self.log.debug(f"{test_class} has bases {test_class_bases}")
 
         class_derives_yas_handler = str(YasHandler) in [str(base) for base in test_class_bases]
-        class_defines_required_methods = 'handle' in public_methods and 'test' in public_methods
+        class_defines_required_methods = 'handle' in methods and 'test' in methods
 
         check_or_x = {True: '✔', False: '✘'}
 
@@ -101,6 +101,18 @@ class HandlerManager:
                 self.log.error(f'Failed to load handler {handler_class}, caught:\n{traceback.format_exc()}')
                 if self.config.debug:
                     raise exception
+
+        return handlers
+
+    def setup_handlers(self, handlers):
+        for handler in handlers:
+            try:
+                handler.setup()
+            except Exception as exception:
+                self.log.error(f'Failed to setup handler {handler}, caught:\n{traceback.format_exc()}')
+                if self.config.debug:
+                    raise exception
+
         return handlers
 
     def __retrieve_users_list(self):
@@ -111,10 +123,7 @@ class HandlerManager:
         return api_call.get('members')
 
     def retrieve_user_id(self, username):
-        users_list = self.__retrieve_users_list()
-
-        self.log.info(f"Users: {users_list}")
-        for user in users_list:
+        for user in self.users_list:
             if 'name' in user and user.get('name') == username:
                 return user.get('id')
         else:
@@ -129,7 +138,7 @@ class HandlerManager:
         return creator_info
 
     def handle(self, data, reply):
-        self.log.debug(f"Handling {data}")
+        self.log.debug(f"Considering {data}")
         for handler in self.handler_list:
             self.log.debug(f"Testing {data['yas_hash']} against {handler}")
             if handler.test(data):
