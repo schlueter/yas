@@ -17,7 +17,6 @@ class HelpHandler(YasHandler):
         bot_id = self.bot.retrieve_user_id(self.bot.config.bot_name)
         message_words = [element for element in data.get('text', '').split(' ')
                          if element != "<@" + bot_id + ">"]
-        self.bot.log.debug(f"Checking message words {message_words}")
 
         if 'help' == message_words[0]:
             self.message_words = set(message_words)
