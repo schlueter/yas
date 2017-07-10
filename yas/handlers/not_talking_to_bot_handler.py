@@ -12,6 +12,7 @@ class NotTalkingToBotHandler(YasHandler):
 
         # @message the bot
         if self.at_bot in data.get('text', ''):
+            self.bot.log.debug(f"Message contained {self.at_bot}, {data['yas_hash']}")
             return False
 
         channel = data.get('channel')
@@ -20,6 +21,7 @@ class NotTalkingToBotHandler(YasHandler):
 
         # Direct message
         if not channel_info.get('ok') and not group_info.get('ok') and not data.get('user') == self.bot_id:
+            self.bot.log.debug(f"Direct message to {self.at_bot}, {data['yas_hash']}")
             return False
 
         return True
