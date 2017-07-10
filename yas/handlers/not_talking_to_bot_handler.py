@@ -6,6 +6,7 @@ class NotTalkingToBotHandler(YasHandler):
     def __init__(self, bot):
         super().__init__(bot)
         self.bot_id = self.bot.retrieve_user_id(self.bot.config.bot_name)
+        self.bot.log.debug(f"The bot initializing is named {self.bot.config.bot_name}")
         self.at_bot = "<@" + self.bot_id + ">"
 
     def test(self, data):
