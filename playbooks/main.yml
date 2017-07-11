@@ -20,6 +20,6 @@
         content: |
           pip install -U /vagrant
           sudo systemctl restart yas
-          journalctl -xefu yas
+          journalctl -xaefu yas
           cp /vagrant/yas.yml /usr/local/lib/pyenv/versions/3.6.0/etc/yas/
           sudo chmod -R 2775 /usr/local/lib/pyenv/

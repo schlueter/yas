@@ -1,10 +1,12 @@
 *.pyc
-/.eggs/
-/build/
+.eggs/
+.vagrant
 AUTHORS
 ChangeLog
 Facade.egg-info/
+Yas.egg-info/
 build/
+ubuntu-xenial-16.04-cloudimg-console.log
 yas.env
 /Yas.egg-info/
 /.vagrant
