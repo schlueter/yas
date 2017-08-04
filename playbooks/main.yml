@@ -23,3 +23,23 @@
           journalctl -xaefu yas
           cp /vagrant/yas.yml /usr/local/lib/pyenv/versions/3.6.0/etc/yas/
           sudo chmod -R 2775 /usr/local/lib/pyenv/
+
+    - name: Copy yas config
+      template:
+        src: yas.yml.j2
+        dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
+
+    - name: Copy handler configs
+      copy:
+        content: "{{ item.content | to_nice_yaml }}"
+        dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item.name }}.yml
+      with_items: "{{ handler_configs }}"
+      when: handler_configs
+
+    - name: Install handler packages
+      pip:
+        name={{ item }}
+        state=latest
+        executable={{ pip_executable }}
+      with_items: "{{ handler_packages }}"
+      when: handler_packages

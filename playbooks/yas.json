@@ -1,0 +1,38 @@
+{
+  "slack_app_token": "xoxb-202127574066-xmMAdSeRzHM7vb2CFhIaimzv",
+  "bot_name": "cw-tester",
+  "additional_handlers": ["yas_openstack.handler."],
+  "log_level": "DEBUG",
+  "handler_exception_message": "Womp, I caught an error on that: \n&gt;{exception} \nPlease reach out to devops for assistance.",
+  "handler_configs": [
+    {
+      "name": "openstack",
+      "content": {
+        "username": "public",
+        "password": "public",
+        "domain": "cloud.rf29.net",
+        "project_name": "public",
+        "auth_url": "http://control01.cloud.rf29.net:5000",
+        "create_server_defaults": {
+          "userdata": "etc/yas/default-userdata.sh",
+          "flavor_name": "r12.c2.d30",
+          "key_name": "jenkins",
+          "neptune_branch": "master",
+          "nics": "auto",
+          "image_name": "master"},
+        "webhooks": {
+          "server": {
+            "delete": {
+              "url": "https://jenkins.prod.rf29.net/buildByToken/buildWithParameters",
+              "params": {
+                "job": "CloudServerObliterate",
+                "token": "obliterate"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "handler_packages": ["git+https://github.com/refinery29/YasOpenstack.git"]
+}

@@ -1,0 +1,23 @@
+---
+slack_app_token: {{ slack_app_token }}
+bot_name: {{ bot_name }}
+
+ignored_types:
+  - desktop_notification
+  - user_typing
+  - presence_change
+  - reconnect_url
+  - hello
+
+handler_list:
+  - yas.handlers.ignored_types_handler.
+  - yas.handlers.not_talking_to_bot_handler.
+  - yas.handlers.help_handler.
+{% for handler in additional_handlers %}
+  - {{ handler }}
+{% endfor %}
+  - yas.handlers.identify_handler.
+  - yas.handlers.rules_handler.
+
+log_level: {{ log_level }}
+handler_exception_message: {{ handler_exception_message }}
