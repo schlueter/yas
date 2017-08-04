@@ -1,6 +1,7 @@
 ---
 - hosts: yas
   gather_facts: no
+  become: yes
   tasks:
     - name: apt-get update
       raw: apt-get update -qq
@@ -12,34 +13,26 @@
   become: yes
   roles: [ yas ]
   tasks:
-    - name: Put some useful things in bash history
-      copy:
-        dest: /home/ubuntu/.bash_history
-        owner: ubuntu
-        group: ubuntu
-        content: |
-          pip install -U /vagrant
-          sudo systemctl restart yas
-          journalctl -xaefu yas
-          cp /vagrant/yas.yml /usr/local/lib/pyenv/versions/3.6.0/etc/yas/
-          sudo chmod -R 2775 /usr/local/lib/pyenv/
-
     - name: Copy yas config
       template:
         src: yas.yml.j2
         dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
 
-    - name: Copy handler configs
+    - name: Copy handler configs from vars
       copy:
         content: "{{ item.content | to_nice_yaml }}"
-        dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item.name }}.yml
+        dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item.name }}
       with_items: "{{ handler_configs }}"
       when: handler_configs
 
+    - name: Copy handler configs as files
+      copy:
+        src: custom/{{ item }}
+        dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item }}
+      with_items: "{{ handler_config_files }}"
+      when: handler_config_files
+
     - name: Install handler packages
-      pip:
-        name={{ item }}
-        state=latest
-        executable={{ pip_executable }}
+      command: "{{ pip_executable }} install {{ item }}"
       with_items: "{{ handler_packages }}"
       when: handler_packages

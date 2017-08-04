@@ -62,6 +62,7 @@
   register: versions
   changed_when: no
   ignore_errors: yes
+  check_mode: no
 
 - name: Install some pythons
   command: /usr/local/lib/pyenv/bin/pyenv install {{ item }}
