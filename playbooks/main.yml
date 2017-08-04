@@ -18,6 +18,11 @@
         src: yas.yml.j2
         dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
 
+    - name: Install handler packages
+      command: "{{ pip_executable }} install {{ item }}"
+      with_items: "{{ handler_packages }}"
+      when: handler_packages
+
     - name: Copy handler configs from vars
       copy:
         content: "{{ item.content | to_nice_yaml }}"
@@ -31,8 +36,3 @@
         dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item }}
       with_items: "{{ handler_config_files }}"
       when: handler_config_files
-
-    - name: Install handler packages
-      command: "{{ pip_executable }} install {{ item }}"
-      with_items: "{{ handler_packages }}"
-      when: handler_packages
