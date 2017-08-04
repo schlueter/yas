@@ -5,6 +5,7 @@
     dest={{ local_repository }}
     version={{ yas_repo_version }}
     accept_hostkey=yes
+  check_mode: no
 
 - name: Install yas
   pip:
