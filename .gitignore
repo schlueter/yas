@@ -12,5 +12,5 @@ yas.env
 /.vagrant
 ubuntu-xenial-16.04-cloudimg-console.log
 yas.yml
-/playbooks/group_vars/all/custom.yml
+/playbooks/group_vars/yas/custom.yml
 /playbooks/files/custom/**/*
