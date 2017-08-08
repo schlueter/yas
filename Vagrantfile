@@ -13,5 +13,6 @@ Vagrant.configure(2) do |config|
     playbook: 'playbooks/main.yml',
     raw_arguments: %w(--diff -vv --become),
     groups: { yas: %w(default)},
-    extra_vars: { local_repository: '/vagrant' }
+    extra_vars: { local_repository: '/vagrant',
+                  yas_repo_update: false }
 end
