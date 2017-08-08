@@ -41,7 +41,6 @@
   command: "{{ pip_executable }} install {{ item }}"
   with_items: "{{ handler_packages }}"
   when: handler_packages
-  notify: restart yas
 
 - name: Copy handler configs from vars
   copy:
