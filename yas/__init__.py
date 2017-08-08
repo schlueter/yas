@@ -20,6 +20,6 @@ class RegexHandler(YasHandler):
         self.at_bot = "<@" + bot_id + ">"
 
     def test(self, data):
-        text = data.get('text').replace(self.at_bot, '').strip()
+        text = data.get('text', '').replace(self.at_bot, '').strip()
         self.current_match = self.regexp.search(text)
         return self.current_match
