@@ -1,33 +1,17 @@
-Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/xenial64"
-  config.vm.synced_folder "../YasOpenStack", "/srv/YasOpenStack"
-  config.vm.synced_folder "../YasExampleHandlers", "/srv/YasExampleHandlers"
-  ansible_extra_vars = {}
-  ansible_extra_vars['local_repository'] = '/vagrant'
-  ansible_extra_vars['log_level'] = ENV['LOG_LEVEL'] || 'DEBUG'
+Vagrant.configure(2) do |config|
+  config.vm.box = 'ubuntu/xenial64'
 
   %w(YasOpenStack YasExampleHandlers).each do |repo|
     local_path = '../' + repo
     remote_path = '/srv/' + repo
-    if Dir.exists?(local_path) then
+    if Dir.exists?(local_path)
       config.vm.synced_folder(local_path, remote_path)
     end
   end
 
-  if ENV.has_key?('SLACK_APP_TOKEN')
-    ansible_extra_vars['slack_app_token'] = ENV['SLACK_APP_TOKEN']
-  end
-
-  if ENV.has_key?('SLACK_APP_NAME')
-    ansible_extra_vars['slack_app_name'] = ENV['SLACK_APP_NAME']
-  end
-
-  config.vm.provision(
-    :ansible,
-    playbook: "playbooks/main.yml",
-    sudo: true,
-    verbose: "vv",
-    raw_arguments: ["--diff"],
-    extra_vars: ansible_extra_vars
-  )
+  config.vm.provision :ansible,
+    playbook: 'playbooks/main.yml',
+    raw_arguments: %w(--diff -vv --become),
+    groups: { yas: %w(default)},
+    extra_vars: { local_repository: '/vagrant' }
 end

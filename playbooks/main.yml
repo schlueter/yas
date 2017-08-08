@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: yas
   gather_facts: no
   tasks:
     - name: apt-get update
@@ -7,7 +7,7 @@
     - name: Install python 2.7
       raw: apt-get install -qq python-minimal
 
-- hosts: all
+- hosts: yas
   gather_facts: yes
   become: yes
   roles: [ yas ]
