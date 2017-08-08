@@ -7,6 +7,7 @@
     accept_hostkey=yes
     update={{ yas_repo_update }}
   check_mode: no
+  notify: restart yas
 
 - name: Install yas
   pip:
@@ -20,11 +21,40 @@
     remote_src=yes
     dest=/etc/systemd/system/yas.service
   when: ansible_service_mgr == 'systemd'
+  notify: restart yas
 
 - name: Activate yas systemd service
   systemd:
     name=yas
     daemon_reload=yes
-    enabled=yes
     state=started
+    enabled=yes
   when: ansible_service_mgr == 'systemd'
+
+- name: Copy yas config
+  template:
+    src: yas.yml.j2
+    dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/yas.yml
+  notify: restart yas
+
+- name: Install handler packages
+  command: "{{ pip_executable }} install {{ item }}"
+  with_items: "{{ handler_packages }}"
+  when: handler_packages
+  notify: restart yas
+
+- name: Copy handler configs from vars
+  copy:
+    content: "{{ item.content | to_nice_yaml }}"
+    dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item.name }}
+  with_items: "{{ handler_configs }}"
+  when: handler_configs
+  notify: restart yas
+
+- name: Copy handler configs as files
+  copy:
+    src: custom/{{ item }}
+    dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item }}
+  with_items: "{{ handler_config_files }}"
+  when: handler_config_files
+  notify: restart yas
