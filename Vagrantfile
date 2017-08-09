@@ -4,7 +4,7 @@ Vagrant.configure(2) do |config|
   %w(YasOpenStack YasExampleHandlers).each do |repo|
     local_path = '../' + repo
     remote_path = '/srv/' + repo
-    if Dir.exists?(local_path)
+    if Dir.exists? local_path
       config.vm.synced_folder(local_path, remote_path)
     end
   end
