@@ -50,10 +50,10 @@
   when: handler_configs
   notify: restart yas
 
-- name: Copy handler configs as files
+- name: Install handler configs
   copy:
-    src: custom/{{ item }}
-    dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item }}
+    src: "{{ item.file }}"
+    dest: /usr/local/lib/pyenv/versions/3.6.0/etc/yas/{{ item.name }}
   with_items: "{{ handler_config_files }}"
   when: handler_config_files
   notify: restart yas
