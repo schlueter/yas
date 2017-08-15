@@ -1,3 +1,6 @@
 ---
 local_repository: /tmp/yas
 pip_executable: /usr/local/lib/pyenv/versions/3.6.0/bin/pip
+yas_repo: https://github.com/schlueter/yas.git
+yas_repo_version: master
+yas_repo_update: yes

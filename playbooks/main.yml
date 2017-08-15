@@ -1,25 +1,14 @@
 ---
-- hosts: all
+- hosts: yas
   gather_facts: no
+  become: yes
   tasks:
     - name: apt-get update
       raw: apt-get update -qq
     - name: Install python 2.7
       raw: apt-get install -qq python-minimal
 
-- hosts: all
+- hosts: yas
   gather_facts: yes
   become: yes
   roles: [ yas ]
-  tasks:
-    - name: Put some useful things in bash history
-      copy:
-        dest: /home/ubuntu/.bash_history
-        owner: ubuntu
-        group: ubuntu
-        content: |
-          pip install -U /vagrant
-          sudo systemctl restart yas
-          journalctl -xaefu yas
-          cp /vagrant/yas.yml /usr/local/lib/pyenv/versions/3.6.0/etc/yas/
-          sudo chmod -R 2775 /usr/local/lib/pyenv/
