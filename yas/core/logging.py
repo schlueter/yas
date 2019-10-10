@@ -20,3 +20,7 @@ class Logger:
     def info(self, msg):
         now = datetime.now()
         print(f"{now} [INFO] {msg}")
+
+    def error(self, msg):
+        now = datetime.now()
+        print(f"{now} [ERROR] {msg}")
