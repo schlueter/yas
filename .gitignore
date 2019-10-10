@@ -1,8 +1,0 @@
-*.pyc
-.eggs/
-.vagrant
-AUTHORS
-ChangeLog
-Yas.egg-info/
-build/
-ubuntu-xenial-16.04-cloudimg-console.log
