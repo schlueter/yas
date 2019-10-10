@@ -4,9 +4,13 @@ from yas import YasHandler
 class HelpHandler(YasHandler):
     triggers = ['help']
 
-    def setup(self):
+    def __init__(self, bot):
         self.help_texts = dict()
         self.unaliased_commands = []
+        self.message_words = []
+        super().__init__(bot)
+
+    def setup(self):
         for handler in self.bot.handler_list:
             self.bot.log.debug(f"checking {handler} for triggers variable")
             if hasattr(handler, 'triggers') and handler.__doc__:
@@ -26,17 +30,17 @@ class HelpHandler(YasHandler):
         message_words = [element for element in data.get('text', '').split(' ')
                          if element != "<@" + bot_id + ">"]
 
-        if 'help' == message_words[0]:
+        if message_words[0] == 'help':
             self.message_words = set(message_words)
             return True
-        else:
-            return False
+        return False
 
-    def handle(self, data, reply):
+    def handle(self, _, reply):
         requested_help_texts = self.message_words.difference(set(self.triggers))
         if not requested_help_texts:
-            return reply(f"Documented commands: `{', '.join(self.unaliased_commands)}`\n\n" +
-                         f"Use `help <command> [<command> ..]` for help with specific commands.\n")
-        for word in requested_help_texts:
-            if word in self.help_texts.keys():
-                reply(f"*`{word}`*: {self.help_texts[word]}" + "\n\n")
+            reply(f"Documented commands: `{', '.join(self.unaliased_commands)}`\n\n" +
+                  f"Use `help <command> [<command> ..]` for help with specific commands.\n")
+        else:
+            for word in requested_help_texts:
+                if word in self.help_texts.keys():
+                    reply(f"*`{word}`*: {self.help_texts[word]}" + "\n\n")

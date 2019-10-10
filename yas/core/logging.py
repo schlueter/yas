@@ -1,3 +1,4 @@
+#pylint: disable=no-self-use
 from datetime import datetime
 
 class Logger:
@@ -19,4 +20,3 @@ class Logger:
     def info(self, msg):
         now = datetime.now()
         print(f"{now} [INFO] {msg}")
-

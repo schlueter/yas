@@ -21,5 +21,5 @@ class RegexHandler(YasHandler):
 
     def test(self, data):
         text = data.get('text', '').replace(self.at_bot, '').strip()
-        self.current_match = self.regexp.search(text)
-        return self.current_match
+        current_match = self.regexp.search(text)
+        return bool(current_match)

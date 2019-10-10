@@ -8,11 +8,15 @@ class IdentifyHandler(RegexHandler):
     triggers = ['id']
 
     def __init__(self, bot):
-        super().__init__(r'^id', bot)
-
-    def handle(self, _, reply):
         soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         soc.connect(("8.8.8.8", 80))
-        my_ip = soc.getsockname()[0]
-        my_hostname = socket.gethostbyaddr(socket.gethostname())[0]
-        reply(f"My host is {my_hostname} at {my_ip}.")
+        self.ip_address = soc.getsockname()[0]
+        self.hostname = socket.gethostbyaddr(socket.gethostname())[0]
+        super().__init__(r'^id', bot)
+
+    # Pylint thinks this method could be a function because it does not use `self`.
+    # In fact, this class must meet a specification which requires a method `handle`,
+    # but that method need not access
+    # pylint: disable=no-self-use
+    def handle(self, _, reply):
+        reply(f"My host is {self.hostname} at {self.ip_address}.")

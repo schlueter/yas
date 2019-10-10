@@ -1,9 +1,9 @@
 import imp
 import inspect
-import sys
 import traceback
 
 from yas import YasHandler
+from yas.core import errors
 
 
 def import_from_dotted_path(dotted_names, path=None):
@@ -50,14 +50,16 @@ class HandlerManager:
             self.log.info(f"Searching for {handler_name}")
             handler = import_from_dotted_path(handler_name)
 
-            if type(handler) is type and self.is_handler(handler):
+            if isinstance(handler, type) and self.is_handler(handler):
                 self.log.info(f"Found handler {handler}.")
                 handler_class_list.append(handler)
                 continue
 
             module_handlers = self.find_handlers_in_module(handler)
             if module_handlers:
-                self.log.info(f"Found handlers in {handler_name}: {module_handlers}")
+                self.log.info(
+                    f"Found handlers in {handler_name}: {module_handlers}"
+                )
                 handler_class_list.extend(module_handlers)
                 continue
 
@@ -70,8 +72,10 @@ class HandlerManager:
         self.log.info(f'Loaded handlers: {self.handler_list}')
 
     def find_handlers_in_module(self, handler_module):
-        return [handler[1] for handler in inspect.getmembers(handler_module, inspect.isclass)
-                if self.is_handler(handler[1])]
+        return [handler[1] for handler in inspect.getmembers(
+            handler_module,
+            inspect.isclass
+        ) if self.is_handler(handler[1])]
 
 
     def is_handler(self, test_class):
@@ -81,13 +85,24 @@ class HandlerManager:
         test_class_bases = get_ancestors(test_class)
         self.log.debug(f"{test_class} has bases {test_class_bases}")
 
-        class_derives_yas_handler = str(YasHandler) in [str(base) for base in test_class_bases]
-        class_defines_required_methods = 'handle' in methods and 'test' in methods
+        class_derives_yas_handler = str(YasHandler) in [
+            str(base) for base in test_class_bases
+        ]
+        class_defines_required_methods = (
+            'handle' in methods
+            and 'test' in methods
+        )
 
         check_or_x = {True: '✔', False: '✘'}
 
-        self.log.info(f"{check_or_x[class_derives_yas_handler]} {test_class} derives YasHandler")
-        self.log.info(f"{check_or_x[class_defines_required_methods]} {test_class} defines required methods")
+        self.log.info(
+            f"{check_or_x[class_derives_yas_handler]} {test_class} " +
+            "derives YasHandler"
+        )
+        self.log.info(
+            f"{check_or_x[class_defines_required_methods]} {test_class} " +
+            "<defines required methods"
+        )
 
         return class_derives_yas_handler and class_defines_required_methods
 
@@ -97,6 +112,7 @@ class HandlerManager:
             try:
                 new_handler = handler_class(self)
                 handlers.append(new_handler)
+            # pylint: disable=broad-except
             except Exception as exception:
                 self.log.error(f'Failed to load handler {handler_class}, caught:\n{traceback.format_exc()}')
                 if self.config.debug:
@@ -108,6 +124,7 @@ class HandlerManager:
         for handler in handlers:
             try:
                 handler.setup()
+            # pylint: disable=broad-except
             except Exception as exception:
                 self.log.error(f'Failed to setup handler {handler}, caught:\n{traceback.format_exc()}')
                 if self.config.debug:
@@ -119,21 +136,23 @@ class HandlerManager:
         self.log.info("Retrieving users list...")
         api_call = self.api_call("users.list")
         if not api_call.get('ok'):
-            raise SlackClientFailure("Unable to query api! This is usually due to an incorrect api key, please check your yas config.")
+            raise errors.SlackClientNotOk(
+                "Unable to query api! This is usually due to an incorrect api key, please check your yas config."
+            )
         return api_call.get('members')
 
     def retrieve_user_id(self, username):
         for user in self.users_list:
             if 'name' in user and user.get('name') == username:
                 return user.get('id')
-        else:
-            raise NoSuchUser(self.bot_name)
+        raise errors.NoSuchUser(self.config.bot_name)
 
     def retrieve_user_info(self, user_id):
         try:
             creator_info = self.api_call('users.info', user=user_id)
-        except Exception as e:
-            self.log.warn(f"Caught {e} while retrieving creator_info.")
+        # pylint: disable=broad-except
+        except Exception as error:
+            self.log.warn(f"Caught {error} while retrieving creator_info.")
             creator_info = None
         return creator_info
 
@@ -146,7 +165,9 @@ class HandlerManager:
                 try:
                     handler.handle(data, reply)
                 except Exception as exception:
-                    self.log.error(f"Caught {exception} while handling {data['yas_hash']} with {handler}:\n{traceback.format_exc()}")
+                    self.log.error(
+                        f"Caught {exception} while handling {data['yas_hash']} "
+                        f"with {handler}:\n{traceback.format_exc()}")
                     raise exception
                 break
         else:

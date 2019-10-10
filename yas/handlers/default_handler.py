@@ -11,22 +11,7 @@ class DefaultHandler(YasHandler):
     as they are receieved.
     '''
 
-    def test(self, _):
-        '''
-        If this method returns truthy, this class's handle method is called with the data.
-        By default, this handler is registered with yas. To disable, remove
-        yas.handler from the handler_list in your yas.yml.
-
-        Arguments:
-
-        data :: dict :: An event from the slack RTM websocket. To see the raw
-            stream, enable the raw_response handler. The objects are pre filtered by
-            the yas client's data_filter method, which by default filters out any
-            ignored types from the yas config, objects not associated with a
-            channel, and objects originating from the bot. The implementation of this
-            behaviour is likely to change in the future, but the default filters are not.
-        '''
-        return True
+    test = lambda _, __: True
 
     def handle(self, _, reply):
         '''
