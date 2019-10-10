@@ -1,6 +1,0 @@
----
-- name: restart yas
-  systemd:
-    name=yas
-    state=restarted
-  when: ansible_service_mgr == 'systemd'
