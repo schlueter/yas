@@ -17,7 +17,7 @@ class Client(SlackClient):
 
     def __init__(self, ignored_types=None):
         self.config = YamlConfiguration()
-        self.log = Logger(self.config.log_level).log
+        self.log = Logger(self.config.log_level)
         super().__init__(self.config.slack_app_token)
         self.handler_manager = HandlerManager(self.config, self.api_call, self.log)
 
