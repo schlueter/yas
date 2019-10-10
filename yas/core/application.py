@@ -1,4 +1,4 @@
-from yas.client import Client
+from yas.core.client import Client
 
 
 def run():

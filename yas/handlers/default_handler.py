@@ -1,34 +1,19 @@
-from yas import YasHandler, HandlerError
-from yas.yaml_file_config import YamlConfiguration
+from yas import YasHandler
 
-
-config = YamlConfiguration()
 
 class DefaultHandler(YasHandler):
+    '''The default handler replys to everything with the default response as defined in the bot config'''
+    triggers = ["default"]
+
     '''
     YasHandlers, when registered with a Yas installation in the active yas.yml,
     are tested against, and upon matching applied to, incoming messages by Yas
     as they are receieved.
     '''
 
-    def test(self, data):
-        '''
-        If this method returns truthy, this class's handle method is called with the data.
-        By default, this handler is registered with yas. To disable, remove
-        yas.handler from the handler_list in your yas.yml.
+    test = lambda _, __: True
 
-        Arguments:
-
-        data :: dict :: An event from the slack RTM websocket. To see the raw
-            stream, enable the raw_response handler. The objects are pre filtered by
-            the yas client's data_filter method, which by default filters out any
-            ignored types from the yas config, objects not associated with a
-            channel, and objects originating from the bot. The implementation of this
-            behaviour is likely to change in the future, but the default filters are not.
-        '''
-        return True
-
-    def handle(self, data, reply):
+    def handle(self, _, reply):
         '''
         Handles a matched data object. If a HandlerError is raised here, it will be caught,
         and its message sent to the originating channel; other errors are not caught and
@@ -59,4 +44,4 @@ class DefaultHandler(YasHandler):
             listeners may be registered. This argument may be replaced in the future with
             something more explicit.
         '''
-        reply(config.default_response)
+        reply(self.bot.config.default_response)
