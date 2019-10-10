@@ -18,7 +18,7 @@ class YamlConfiguration(object):
 
     def __parse_config(self, config_file_path):
         with open(config_file_path, 'r') as config_file:
-            raw_config = yaml.load(config_file)
+            raw_config = yaml.load(config_file, Loader=yaml.FullLoader)
 
             parameters = configuration.PARAMETERS
             for parameter in parameters:
