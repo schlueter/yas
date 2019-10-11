@@ -1,26 +1,18 @@
 #pylint: disable=no-self-use
 from datetime import datetime
+import inspect
 
 class Logger:
     def __init__(self, level):
         pass
 
-    def debug(self, msg):
+    def __log(self, *msg):
         now = datetime.now()
-        print(f"{now} [DEBUG] {msg}")
+        method_name = inspect.stack()[1].function
+        print(now, '[' + method_name.upper() + ']', *msg)
 
-    def warn(self, msg):
-        now = datetime.now()
-        print(f"{now} [WARN] {msg}")
-
-    def fatal(self, msg):
-        now = datetime.now()
-        print(f"{now} [FATAL] {msg}")
-
-    def info(self, msg):
-        now = datetime.now()
-        print(f"{now} [INFO] {msg}")
-
-    def error(self, msg):
-        now = datetime.now()
-        print(f"{now} [ERROR] {msg}")
+    def debug(self, *msg): self.__log(*msg)
+    def warn(self, *msg): self.__log(*msg)
+    def fatal(self, *msg): self.__log(*msg)
+    def info(self, *msg): self.__log(*msg)
+    def error(self, *msg): self.__log(*msg)
