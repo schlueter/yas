@@ -8,7 +8,6 @@ setup(
     version='2.0-rc0',
     packages=find_packages(),
     install_requires=[
-        'PyYAML>=3.12',
         'slackclient==1.0.5',
         'websocket-client==0.40.0'
     ],

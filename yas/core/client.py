@@ -1,4 +1,3 @@
-# pylint: disable=no-member
 import hashlib
 import time
 from threading import Thread
@@ -8,7 +7,7 @@ from slackclient import SlackClient
 from yas.core import errors
 from yas.core.handler_manager import HandlerManager
 from yas.core.logging import Logger
-from yas.core.yaml_file_config import YamlConfiguration
+from yas.core.env_configuration import EnvConfiguration as Configuration
 
 
 def rough_hash(string):
@@ -17,9 +16,9 @@ def rough_hash(string):
 class Client(SlackClient):
 
     def __init__(self, ignored_types=None):
-        self.config = YamlConfiguration()
+        self.config = Configuration()
         self.log = Logger(self.config.log_level)
-        super().__init__(self.config.slack_app_token)
+        super().__init__(self.config.slack_token)
         self.handler_manager = HandlerManager(
             self.config,
             self.api_call,
