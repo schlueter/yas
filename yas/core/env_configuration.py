@@ -11,7 +11,7 @@ DEFAULTS = dict(
     ],
     handler_list=[
         'yas.handlers.ignored_types_handler.',
-#        'yas.handlers.not_talking_to_bot_handler.',
+        'yas.handlers.not_talking_to_bot_handler.',
         'yas.handlers.help_handler.',
         'yas.handlers.identify_handler.',
         'yas.handlers.rules_handler.',
