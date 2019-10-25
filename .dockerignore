@@ -1,0 +1,9 @@
+.dockerignore
+.gitignore
+.pylintrc
+/.git/
+/build/
+/dist/
+/yas.egg-info/
+Dockerfile
+Makefile
