@@ -1,11 +1,11 @@
 DOCKER_REPOSITORY := schlueter
+CONTAINER_NAME := yas
 VERSION := $(shell sed -En "s/.*version='([^']+)'.*/\1/p" setup.py)
-CONTAINER_TAG := ${DOCKER_REPOSITORY}/yas:${VERSION}
-CONTAINER_LATEST_TAG := ${DOCKER_REPOSITORY}/yas:latest
-PACKAGE := yas
+CONTAINER_TAG := ${DOCKER_REPOSITORY}/${CONTAINER_NAME}:${VERSION}
+CONTAINER_LATEST_TAG := ${DOCKER_REPOSITORY}/${CONTAINER_NAME}:latest
 
 noop:
-	echo 'Doing nothing. Have a look at the Makefile if you want to find something to do.'
+	@echo 'Doing nothing. Have a look at the Makefile if you want to find something to do.'
 
 dist: dist/${PACKAGE}-${VERSION}.tar.gz
 
@@ -34,4 +34,15 @@ dockerhub-latest: build-container
 	docker tag ${CONTAINER_TAG} ${CONTAINER_LATEST_TAG}
 	docker push ${CONTAINER_LATEST_TAG}
 
-.PHONY: noop update-on-test-pypi update-on-pypi update-on-dockerhub dist test-pypi pypi build-container dockerhub
+git-tag:
+	git tag -s ${VERSION}
+	git push --tags
+
+.PHONY: \
+	dist \
+	git-tag \
+	noop \
+	pypi update-on-pypi \
+	test-pypi update-on-test-pypi \
+   	build-container \
+   	dockerhub update-on-dockerhub \

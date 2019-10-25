@@ -4,6 +4,6 @@
 /.git/
 /build/
 /dist/
-/yas.egg-info/
+/*.egg-info/
 Dockerfile
 Makefile
