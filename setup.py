@@ -2,9 +2,15 @@
 
 from setuptools import setup, find_packages
 
+
+with open("README.md", "r") as fh:
+    LONG_DESCRIPTION = fh.read()
+
 setup(
     name='yas',
-    summary='Yet Another Slack bot',
+    description='Yet Another Slack bot',
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type="text/markdown",
     version='2.0-rc1',
     packages=find_packages(),
     install_requires=[
