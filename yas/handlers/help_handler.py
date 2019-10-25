@@ -18,7 +18,8 @@ class HelpHandler(YasHandler):
 
                 aliases = ''
                 if len(handler.triggers) > 1:
-                    aliases = f"Aliases: `{', '.join(handler.triggers)}`"
+                    triggers = ', '.join(handler.triggers)
+                    aliases = f"Aliases: `{triggers}`"
 
                 for trigger in handler.triggers:
                     self.help_texts[trigger] = handler.__doc__ + aliases
