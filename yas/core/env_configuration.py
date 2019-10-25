@@ -39,9 +39,13 @@ class EnvConfiguration:
             'YAS_HANDLER_EXCEPTION_MESSAGE',
             DEFAULTS['handler_exception_message']
         )
-        self.ignored_types = (os.environ.get('YAS_IGNORED_TYPES', '').split(',').remove('')
-                              or DEFAULTS['ignored_types'])
-        self.handler_list = (os.environ.get('YAS_HANDLER_LIST', '').split(',').remove('')
-                             or DEFAULTS['handler_list'])
+        self.ignored_types = (
+            [t for t in os.environ.get('YAS_IGNORED_TYPES', '').split(',') if not t == '']
+            or DEFAULTS['ignored_types']
+        )
+        self.handler_list = (
+            [h for h in os.environ.get('YAS_HANDLER_LIST', '').split(',') if not h == '']
+            or DEFAULTS['handler_list']
+        )
         if self.debug:
             print('Configuration:\n', self.__dict__)
