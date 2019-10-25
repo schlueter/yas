@@ -17,7 +17,6 @@ DEFAULTS = dict(
         'yas.handlers.rules_handler.',
         'yas.handlers.default_handler.'
     ],
-    default_response='Sure...write some more code then I can do that!',
     log_level='WARN',
     handler_exception_message=(
         "Err, sorry, that threw an exception: {exception}. "
@@ -36,10 +35,6 @@ class EnvConfiguration:
         self.debug = os.environ.get('YAS_DEBUG')
         self.bot_name = os.environ.get('YAS_BOT_NAME', 'YAS')
         self.log_level = os.environ.get('YAS_LOG_LEVEL', DEFAULTS['log_level'])
-        self.default_response = os.environ.get(
-            'YAS_DEFAULT_RESPONSE',
-            DEFAULTS['default_response']
-        )
         self.handler_exception_message = os.environ.get(
             'YAS_HANDLER_EXCEPTION_MESSAGE',
             DEFAULTS['handler_exception_message']

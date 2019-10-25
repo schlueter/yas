@@ -1,3 +1,5 @@
+import os
+
 from yas import YasHandler
 
 
@@ -12,6 +14,13 @@ class DefaultHandler(YasHandler):
     '''
 
     test = lambda _, __: True
+
+    def __init__(self, bot):
+        super().__init__(bot)
+        self.default_response = os.environ.get(
+            'YAS_DEFAULT_RESPONSE',
+            'Sure...write some more code then I can do that!'
+        )
 
     def handle(self, _, reply):
         '''
@@ -44,4 +53,4 @@ class DefaultHandler(YasHandler):
             listeners may be registered. This argument may be replaced in the future with
             something more explicit.
         '''
-        reply(self.bot.config.default_response)
+        reply(self.default_response)
