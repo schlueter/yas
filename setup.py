@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 setup(
     name='yas',
     summary='Yet Another Slack bot',
-    version='2.0-rc0',
+    version='2.0-rc1',
     packages=find_packages(),
     install_requires=[
         'slackclient==1.0.5',
