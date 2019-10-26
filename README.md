@@ -1,7 +1,7 @@
 # YAS
 ###### Yet Another Slack bot
 The operations team at Refinery29 was replacing a old system for
-launching development systems which utilize an older version of
+launching development systems which utilized an older version of
 [Hubot](https://hubot.github.com/). At the time our team was more
 comfortable with python than the Node/Coffeescript which Hubot is
 built on, and we were already familiar with python modules with
