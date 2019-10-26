@@ -5,5 +5,5 @@ ENV YAS_DEBUG ''
 ENV YAS_BOT_NAME 'YAS'
 
 COPY . .
-RUN python -m pip install yas
+RUN python setup.py install && rm -rf build dist
 CMD yas
