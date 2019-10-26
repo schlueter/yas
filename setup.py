@@ -11,7 +11,7 @@ setup(
     description='Yet Another Slack bot',
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    version='2.0-rc1',
+    version='2.0',
     packages=find_packages(),
     install_requires=[
         'slackclient==1.0.5',
