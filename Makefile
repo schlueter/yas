@@ -1,8 +1,5 @@
-DOCKER_REPOSITORY := schlueter
-CONTAINER_NAME := yas
+PACKAGE := yas
 VERSION := $(shell sed -En "s/.*version='([^']+)'.*/\1/p" setup.py)
-CONTAINER_TAG := ${DOCKER_REPOSITORY}/${CONTAINER_NAME}:${VERSION}
-CONTAINER_LATEST_TAG := ${DOCKER_REPOSITORY}/${CONTAINER_NAME}:latest
 
 
 noop:
